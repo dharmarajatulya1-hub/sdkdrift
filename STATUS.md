@@ -2,7 +2,7 @@
 
 Last updated: 2026-02-19
 Branch: `main`
-Latest commit: `021dbc2`
+Latest commit: `98ebc56`
 
 ## Sprint: Final MVP Completion
 Tracking mode: small sequential commits with validation after each milestone.
@@ -24,6 +24,9 @@ Tracking mode: small sequential commits with validation after each milestone.
 - Fixture matrix + automated fixture test runner.
 - Next.js landing scaffold with waitlist-first CTA and event hooks.
 - CI workflow (`build`, fixture tests, smoke test).
+- Public contracts:
+  - `SCHEMA.md`
+  - `CONFIG_SPEC.md`
 
 ## Current MVP State
 - `python` scan path: functional
@@ -34,17 +37,16 @@ Tracking mode: small sequential commits with validation after each milestone.
 - landing page scaffold: functional (provider wiring pending)
 
 ## In Progress (Current Milestone)
-1. Public contract lock
-- [x] Add report output contract doc (`SCHEMA.md`)
-- [x] Add config contract doc (`CONFIG_SPEC.md`)
+1. Real-world validation pass
+- [x] Expand fixture matrix with realistic naming/resource cases
+- [x] Capture quality snapshot in `VALIDATION_REPORT.md`
 - [ ] Commit and push milestone
 
 ## Remaining Sprint Milestones
-1. Real-world validation pass (additional fixtures + report)
-2. CLI usability polish (`--verbose` diagnostics)
-3. Landing production readiness (real waitlist persistence + legal/SEO)
-4. Distribution readiness (npm release workflow + docs)
-5. CI quality gate extension (extra smoke path)
+1. CLI usability polish (`--verbose` diagnostics)
+2. Landing production readiness (real waitlist persistence + legal/SEO)
+3. Distribution readiness (npm release workflow + docs)
+4. CI quality gate extension (extra smoke path)
 
 ## Definition of "MVP Ready for External Beta"
 - Scans Python + TypeScript SDKs with stable JSON output.
