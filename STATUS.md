@@ -2,7 +2,10 @@
 
 Last updated: 2026-02-19
 Branch: `main`
-Latest commit: `7de05eb`
+Latest commit: `021dbc2`
+
+## Sprint: Final MVP Completion
+Tracking mode: small sequential commits with validation after each milestone.
 
 ## Completed
 - Monorepo scaffold (`core`, `cli`, `python-scanner`, `landing`).
@@ -11,6 +14,7 @@ Latest commit: `7de05eb`
 - Python AST scanner bridge.
 - TypeScript scanner via `ts-morph`.
 - Heuristic matcher + config overrides (`--config`).
+- Config validation with actionable CLI errors.
 - Diff categories implemented:
   - `missing_endpoint`
   - `required_field_added`
@@ -26,39 +30,21 @@ Latest commit: `7de05eb`
 - `ts` scan path: functional
 - score + threshold exit code: functional
 - config overrides (`sdkdrift.config.yaml`): functional
-- landing page scaffold: functional (placeholder backend persistence)
+- config schema validation: functional
+- landing page scaffold: functional (provider wiring pending)
 
-## Open Gaps (High Priority)
-- No persistent waitlist storage yet (API route logs only).
-- Matcher heuristics still basic; needs confidence tuning on real SDKs.
-- No GitHub Action packaging yet.
-- No unit-level test suite per module yet (currently fixture/e2e heavy).
-- No release automation for npm publish yet.
+## In Progress (Current Milestone)
+1. Public contract lock
+- [x] Add report output contract doc (`SCHEMA.md`)
+- [x] Add config contract doc (`CONFIG_SPEC.md`)
+- [ ] Commit and push milestone
 
-## Next Steps (Ordered)
-1. Hardening pass on matcher/diff
-- Validate against real SDKs (Stripe/OpenAI/Twilio fixtures).
-- Add false-positive/false-negative regression fixtures.
-- Add confidence + strategy details in report output.
-
-2. Config contract finalization
-- Add schema validation for `sdkdrift.config.yaml`.
-- Add clear CLI errors for invalid config.
-
-3. Testing expansion
-- Add module unit tests for parser, matcher, diff, scorer.
-- Add TypeScript scanner edge-case tests.
-- Add coverage threshold in CI.
-
-4. Landing MVP completion
-- Connect waitlist to real provider (Supabase/Formspree/ConvertKit).
-- Add privacy/terms pages and SEO metadata.
-- Add conversion event endpoint or analytics SDK.
-
-5. Distribution readiness
-- Add npm package publishing workflow.
-- Add versioning/changelog process.
-- Add GitHub Action wrapper package (`driftguard/action` equivalent for SDKDrift).
+## Remaining Sprint Milestones
+1. Real-world validation pass (additional fixtures + report)
+2. CLI usability polish (`--verbose` diagnostics)
+3. Landing production readiness (real waitlist persistence + legal/SEO)
+4. Distribution readiness (npm release workflow + docs)
+5. CI quality gate extension (extra smoke path)
 
 ## Definition of "MVP Ready for External Beta"
 - Scans Python + TypeScript SDKs with stable JSON output.

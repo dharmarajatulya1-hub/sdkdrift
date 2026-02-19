@@ -36,6 +36,8 @@ node ./packages/cli/dist/cli.js scan \
 
 ## Project Status
 - Current execution tracker: `STATUS.md`
+- JSON contract: `SCHEMA.md`
+- Config contract: `CONFIG_SPEC.md`
 
 ## Near-Term Roadmap
 1. Implement TypeScript SDK scanning with `ts-morph`
