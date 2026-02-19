@@ -1,0 +1,74 @@
+name: Publish Packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (e.g. 0.2.0)"
+        required: true
+      dry_run:
+        description: "Run npm publish in dry-run mode"
+        required: true
+        default: true
+        type: boolean
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Test Fixtures
+        run: npm run test:fixtures
+
+      - name: Prepare release versions
+        run: npm run release:prepare -- ${{ github.event.inputs.version }}
+
+      - name: Validate publish readiness
+        run: npm run release:check
+
+      - name: Publish core (dry-run)
+        if: ${{ github.event.inputs.dry_run == 'true' }}
+        run: npm publish --workspace @sdkdrift/core --access public --dry-run
+
+      - name: Publish python-scanner (dry-run)
+        if: ${{ github.event.inputs.dry_run == 'true' }}
+        run: npm publish --workspace @sdkdrift/python-scanner --access public --dry-run
+
+      - name: Publish cli (dry-run)
+        if: ${{ github.event.inputs.dry_run == 'true' }}
+        run: npm publish --workspace @sdkdrift/cli --access public --dry-run
+
+      - name: Publish core
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        run: npm publish --workspace @sdkdrift/core --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish python-scanner
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        run: npm publish --workspace @sdkdrift/python-scanner --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish cli
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        run: npm publish --workspace @sdkdrift/cli --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

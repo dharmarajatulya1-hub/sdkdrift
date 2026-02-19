@@ -2,7 +2,7 @@
 
 Last updated: 2026-02-19
 Branch: `main`
-Latest commit: `9a20ac1`
+Latest commit: `ea6f0db`
 
 ## Sprint: Final MVP Completion
 Tracking mode: small sequential commits with validation after each milestone.
@@ -15,52 +15,40 @@ Tracking mode: small sequential commits with validation after each milestone.
 - TypeScript scanner via `ts-morph`.
 - Heuristic matcher + config overrides (`--config`).
 - Config validation with actionable CLI errors.
-- Diff categories implemented:
-  - `missing_endpoint`
-  - `required_field_added`
-  - `type_mismatch`
-  - `changed_param`
-  - `extra_sdk_method`
+- Diff categories implemented and validated.
 - Fixture matrix + automated fixture test runner.
-- Next.js landing scaffold with waitlist-first CTA and event hooks.
-- CI workflow with build + fixture tests + multi-path smoke checks.
-- Public contracts:
-  - `SCHEMA.md`
-  - `CONFIG_SPEC.md`
-- Validation snapshot: `VALIDATION_REPORT.md`
-- CLI usability polish:
-  - `--verbose` matcher diagnostics to stderr.
-- Landing readiness:
-  - provider-backed waitlist API
-  - `/privacy` and `/terms` pages
-  - metadata/SEO base config
-- Distribution readiness:
-  - release dry-run workflow (`npm pack` artifacts)
-  - release guide (`RELEASE.md`)
+- Next.js landing with waitlist-first CTA, legal pages, and metadata.
+- CI workflow with build + fixtures + smoke checks.
+- Public contracts: `SCHEMA.md`, `CONFIG_SPEC.md`.
+- Validation snapshot: `VALIDATION_REPORT.md`.
+- CLI diagnostics: `--verbose` matcher output to stderr.
+- Release docs/workflows: `RELEASE.md`, `release-dry-run.yml`.
 
 ## Current MVP State
 - `python` scan path: functional
 - `ts` scan path: functional
 - score + threshold exit code: functional
-- config overrides (`sdkdrift.config.yaml`): functional
-- config schema validation: functional
-- landing page: functional with provider-based waitlist persistence support
+- config overrides + validation: functional
+- landing waitlist: provider-backed via env webhook
 
 ## In Progress (Current Milestone)
-1. CI quality gate extension
-- [x] Add TypeScript smoke script
-- [x] Add override smoke script
-- [x] Run both smoke paths locally
-- [ ] Commit and push milestone
+1. NPM publish strategy finalization
+- [x] Convert internal package deps from `file:` to semver ranges.
+- [x] Add release scripts (`release:prepare`, `release:check`).
+- [x] Add publish workflow (`.github/workflows/publish.yml`).
+- [x] Update release/readme docs for publish flow.
+- [ ] Commit and push milestone.
 
 ## Final MVP Sign-off Checklist
-- [x] Contracts documented and versioned
-- [x] Core scan behavior validated on expanded fixture suite
-- [x] CLI diagnostics and threshold behavior verified
-- [x] Landing page deployed with configurable waitlist backend
-- [x] CI validates build + fixtures + smoke paths
-- [x] Release dry-run workflow exists
+- [x] Contracts documented and versioned.
+- [x] Core scan behavior validated on expanded fixture suite.
+- [x] CLI diagnostics and threshold behavior verified.
+- [x] Landing page deployed with configurable waitlist backend.
+- [x] CI validates build + fixtures + smoke paths.
+- [x] Release dry-run + publish workflows exist.
+- [ ] Lockfile refreshed in networked environment after dependency strategy change.
 
-## Remaining for Public NPM Release (post-MVP)
-- Align `package-lock.json` Next.js resolution to patched version in current environment.
-- Finalize publish strategy for local file-based monorepo dependencies.
+## Remaining for First Public NPM Publish
+- Run `npm install` locally to refresh `package-lock.json` and commit if changed.
+- Add `NPM_TOKEN` to GitHub repository secrets.
+- Run `Publish Packages` workflow with `dry_run=true`, then `dry_run=false`.

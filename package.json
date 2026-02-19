@@ -11,6 +11,8 @@
     "typecheck": "npm run --workspace @sdkdrift/core typecheck && npm run --workspace @sdkdrift/python-scanner typecheck && npm run --workspace @sdkdrift/cli typecheck && npm run --workspace @sdkdrift/landing typecheck",
     "test": "npm run --workspaces test",
     "test:fixtures": "node ./tests/run-fixtures.mjs",
+    "release:check": "node ./scripts/check-publish-ready.mjs",
+    "release:prepare": "node ./scripts/prepare-release.mjs",
     "lint": "npm run --workspaces lint",
     "smoke:cli": "node ./packages/cli/dist/cli.js scan --spec ./fixtures/simple/openapi.yaml --sdk ./fixtures/simple/sdk/python --lang python --format terminal",
     "smoke:cli:json": "node ./packages/cli/dist/cli.js scan --spec ./fixtures/simple/openapi.yaml --sdk ./fixtures/simple/sdk/python --lang python --format json --out ./tests/smoke-report.json",

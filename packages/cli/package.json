@@ -7,6 +7,9 @@
   },
   "main": "dist/cli.js",
   "types": "dist/cli.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
@@ -14,8 +17,8 @@
     "lint": "echo 'lint not configured yet'"
   },
   "dependencies": {
-    "@sdkdrift/core": "file:../core",
-    "@sdkdrift/python-scanner": "file:../python-scanner",
+    "@sdkdrift/core": "^0.1.0",
+    "@sdkdrift/python-scanner": "^0.1.0",
     "commander": "^14.0.1",
     "js-yaml": "^4.1.0"
   }

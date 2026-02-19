@@ -73,6 +73,10 @@ Verbose diagnostics are written to stderr and include strategy counts and unmatc
 - Validation snapshot: `VALIDATION_REPORT.md`
 - Release process: `RELEASE.md`
 
+## Package Release
+- Dry-run/package workflows are in `.github/workflows/release-dry-run.yml` and `.github/workflows/publish.yml`.
+- Set `NPM_TOKEN` in GitHub repository secrets before real publish.
+
 ## Near-Term Roadmap
 1. Implement TypeScript SDK scanning with `ts-morph`
 2. Improve matcher heuristics and override mappings
