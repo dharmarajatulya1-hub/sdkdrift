@@ -1,0 +1,16 @@
+{
+  "name": "@sdkdrift/core",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "src/index.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test",
+    "lint": "echo 'lint not configured yet'"
+  },
+  "dependencies": {
+    "@apidevtools/swagger-parser": "^12.1.0"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "sdkdrift-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "SDKDrift monorepo",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run --workspace @sdkdrift/core build && npm run --workspace @sdkdrift/python-scanner build && npm run --workspace @sdkdrift/cli build && npm run --workspace @sdkdrift/landing build",
+    "typecheck": "npm run --workspace @sdkdrift/core typecheck && npm run --workspace @sdkdrift/python-scanner typecheck && npm run --workspace @sdkdrift/cli typecheck && npm run --workspace @sdkdrift/landing typecheck",
+    "test": "npm run --workspaces test",
+    "lint": "npm run --workspaces lint",
+    "smoke:cli": "node ./packages/cli/dist/cli.js scan --spec ./fixtures/simple/openapi.yaml --sdk ./fixtures/simple/sdk/python --lang python --format terminal",
+    "smoke:cli:json": "node ./packages/cli/dist/cli.js scan --spec ./fixtures/simple/openapi.yaml --sdk ./fixtures/simple/sdk/python --lang python --format json --out ./tests/smoke-report.json"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.6.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

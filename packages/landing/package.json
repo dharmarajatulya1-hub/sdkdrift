@@ -1,0 +1,11 @@
+{
+  "name": "@sdkdrift/landing",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "echo 'landing build not configured yet'",
+    "typecheck": "echo 'landing typecheck not configured yet'",
+    "test": "echo 'landing tests not configured yet'",
+    "lint": "echo 'landing lint not configured yet'"
+  }
+}
