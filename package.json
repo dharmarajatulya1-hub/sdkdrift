@@ -13,7 +13,9 @@
     "test:fixtures": "node ./tests/run-fixtures.mjs",
     "lint": "npm run --workspaces lint",
     "smoke:cli": "node ./packages/cli/dist/cli.js scan --spec ./fixtures/simple/openapi.yaml --sdk ./fixtures/simple/sdk/python --lang python --format terminal",
-    "smoke:cli:json": "node ./packages/cli/dist/cli.js scan --spec ./fixtures/simple/openapi.yaml --sdk ./fixtures/simple/sdk/python --lang python --format json --out ./tests/smoke-report.json"
+    "smoke:cli:json": "node ./packages/cli/dist/cli.js scan --spec ./fixtures/simple/openapi.yaml --sdk ./fixtures/simple/sdk/python --lang python --format json --out ./tests/smoke-report.json",
+    "smoke:cli:ts": "node ./packages/cli/dist/cli.js scan --spec ./fixtures/cases/ts-basic/openapi.yaml --sdk ./fixtures/cases/ts-basic/sdk/ts --lang ts --format terminal",
+    "smoke:cli:override": "node ./packages/cli/dist/cli.js scan --spec ./fixtures/cases/override/openapi.yaml --sdk ./fixtures/cases/override/sdk/python --lang python --config ./fixtures/cases/override/sdkdrift.config.yaml --format terminal"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

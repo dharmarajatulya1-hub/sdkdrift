@@ -31,3 +31,9 @@ jobs:
 
       - name: Smoke Test
         run: npm run smoke:cli
+
+      - name: Smoke Test (TypeScript)
+        run: npm run smoke:cli:ts
+
+      - name: Smoke Test (Config Override)
+        run: npm run smoke:cli:override

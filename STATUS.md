@@ -2,7 +2,7 @@
 
 Last updated: 2026-02-19
 Branch: `main`
-Latest commit: `0a1f192`
+Latest commit: `9a20ac1`
 
 ## Sprint: Final MVP Completion
 Tracking mode: small sequential commits with validation after each milestone.
@@ -23,7 +23,7 @@ Tracking mode: small sequential commits with validation after each milestone.
   - `extra_sdk_method`
 - Fixture matrix + automated fixture test runner.
 - Next.js landing scaffold with waitlist-first CTA and event hooks.
-- CI workflow (`build`, fixture tests, smoke test).
+- CI workflow with build + fixture tests + multi-path smoke checks.
 - Public contracts:
   - `SCHEMA.md`
   - `CONFIG_SPEC.md`
@@ -34,6 +34,9 @@ Tracking mode: small sequential commits with validation after each milestone.
   - provider-backed waitlist API
   - `/privacy` and `/terms` pages
   - metadata/SEO base config
+- Distribution readiness:
+  - release dry-run workflow (`npm pack` artifacts)
+  - release guide (`RELEASE.md`)
 
 ## Current MVP State
 - `python` scan path: functional
@@ -44,18 +47,20 @@ Tracking mode: small sequential commits with validation after each milestone.
 - landing page: functional with provider-based waitlist persistence support
 
 ## In Progress (Current Milestone)
-1. Distribution readiness
-- [x] Add release dry-run workflow (`npm pack` artifacts)
-- [x] Add release guide (`RELEASE.md`)
-- [x] Expand README usage + troubleshooting
+1. CI quality gate extension
+- [x] Add TypeScript smoke script
+- [x] Add override smoke script
+- [x] Run both smoke paths locally
 - [ ] Commit and push milestone
 
-## Remaining Sprint Milestones
-1. CI quality gate extension (extra smoke path)
-2. Final MVP checklist sign-off
+## Final MVP Sign-off Checklist
+- [x] Contracts documented and versioned
+- [x] Core scan behavior validated on expanded fixture suite
+- [x] CLI diagnostics and threshold behavior verified
+- [x] Landing page deployed with configurable waitlist backend
+- [x] CI validates build + fixtures + smoke paths
+- [x] Release dry-run workflow exists
 
-## Definition of "MVP Ready for External Beta"
-- Scans Python + TypeScript SDKs with stable JSON output.
-- CI workflow green on all pushes.
-- Landing page deployed with working waitlist persistence.
-- README includes install, usage, config, and troubleshooting.
+## Remaining for Public NPM Release (post-MVP)
+- Align `package-lock.json` Next.js resolution to patched version in current environment.
+- Finalize publish strategy for local file-based monorepo dependencies.
