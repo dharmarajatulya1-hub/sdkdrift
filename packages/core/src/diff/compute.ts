@@ -1,21 +1,48 @@
-import type {
-  DriftCategory,
-  DriftFinding,
-  MatchResult,
-  OperationSurface,
-  SdkMethodSurface
-} from "../types/contracts.js";
-
-function hasParam(method: SdkMethodSurface, name: string): boolean {
-  return method.params.some((param) => param.name.toLowerCase() === name.toLowerCase());
-}
+import type { DriftCategory, DriftFinding, MatchResult, OperationSurface, SdkMethodSurface } from "../types/contracts.js";
 
 function findParam(method: SdkMethodSurface, name: string) {
   return method.params.find((param) => param.name.toLowerCase() === name.toLowerCase());
 }
 
 function normalizeType(value?: string): string {
-  return (value ?? "unknown").toLowerCase().replace(/[^a-z0-9]/g, "");
+  if (!value) return "unknown";
+  let v = value.toLowerCase().trim();
+
+  v = v.replace(/\s+/g, "");
+  v = v.replace(/\|undefined|\|null/g, "");
+  v = v.replace(/^promise<(.+)>$/, "$1");
+  v = v.replace(/^readonlyarray<(.+)>$/, "$1[]");
+  v = v.replace(/^array<(.+)>$/, "$1[]");
+  v = v.replace(/^list<(.+)>$/, "$1[]");
+
+  const alnum = v.replace(/[^a-z0-9\[\]]/g, "");
+
+  const aliases: Record<string, string> = {
+    str: "string",
+    string: "string",
+    text: "string",
+    uuid: "string",
+    date: "string",
+    datetime: "string",
+    int: "number",
+    int32: "number",
+    int64: "number",
+    integer: "number",
+    float: "number",
+    double: "number",
+    decimal: "number",
+    number: "number",
+    bool: "boolean",
+    boolean: "boolean",
+    dict: "object",
+    map: "object",
+    record: "object",
+    object: "object",
+    json: "object"
+  };
+
+  if (alnum.endsWith("[]")) return "array";
+  return aliases[alnum] ?? alnum;
 }
 
 function severityFor(category: DriftCategory): DriftFinding["severity"] {

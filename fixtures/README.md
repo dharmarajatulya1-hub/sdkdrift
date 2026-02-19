@@ -9,3 +9,6 @@ Initial fixtures for MVP scanner and CLI tests.
 - `cases/type-mismatch`: emits `type_mismatch`
 - `cases/override`: validates `sdkdrift.config.yaml` mapping override
 - `cases/ts-basic`: validates TypeScript scanning path
+- `cases/heuristic-nested`: validates nested resource heuristic matching
+- `cases/optional-param`: emits `changed_param` for optional mismatch
+- `cases/invalid-config`: validates config schema error handling

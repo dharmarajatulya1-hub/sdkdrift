@@ -1,0 +1,22 @@
+openapi: 3.0.3
+info:
+  title: Heuristic Nested Case
+  version: 1.0.0
+paths:
+  /v1/organizations/{orgId}/members/{memberId}:
+    get:
+      operationId: getOrganizationMember
+      parameters:
+        - name: orgId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: memberId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ok
