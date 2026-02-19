@@ -26,6 +26,38 @@ node ./packages/cli/dist/cli.js scan \
   --format terminal
 ```
 
+## Config Example
+```yaml
+# sdkdrift.config.yaml
+match:
+  heuristicThreshold: 0.55
+mapping:
+  overrides:
+    - operationId: listUsers
+      sdkMethod: UsersApi.fetch_users
+```
+
+```bash
+node ./packages/cli/dist/cli.js scan \
+  --spec ./fixtures/cases/override/openapi.yaml \
+  --sdk ./fixtures/cases/override/sdk/python \
+  --lang python \
+  --config ./fixtures/cases/override/sdkdrift.config.yaml \
+  --format json
+```
+
+## Verbose Diagnostics
+```bash
+node ./packages/cli/dist/cli.js scan \
+  --verbose \
+  --spec ./fixtures/simple/openapi.yaml \
+  --sdk ./fixtures/simple/sdk/python \
+  --lang python \
+  --format json
+```
+
+Verbose diagnostics are written to stderr and include strategy counts and unmatched operation IDs.
+
 ## Repository Layout
 - `packages/core` shared parsing, matching, diffing, scoring, reporting
 - `packages/cli` CLI command wrapper
@@ -39,6 +71,7 @@ node ./packages/cli/dist/cli.js scan \
 - JSON contract: `SCHEMA.md`
 - Config contract: `CONFIG_SPEC.md`
 - Validation snapshot: `VALIDATION_REPORT.md`
+- Release process: `RELEASE.md`
 
 ## Near-Term Roadmap
 1. Implement TypeScript SDK scanning with `ts-morph`
@@ -50,3 +83,8 @@ node ./packages/cli/dist/cli.js scan \
 - `WAITLIST_WEBHOOK_URL` required for waitlist submissions.
 - `WAITLIST_PROVIDER` optional (`formspree` or `generic`).
 - `NEXT_PUBLIC_SITE_URL` optional canonical URL for metadata.
+
+## Troubleshooting
+- `Invalid config`: validate against `CONFIG_SPEC.md`.
+- `Unknown option` errors: ensure CLI was rebuilt (`npm run build`) after updates.
+- Missing waitlist submissions: verify `WAITLIST_WEBHOOK_URL` is set in Vercel.

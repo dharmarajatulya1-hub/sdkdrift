@@ -2,7 +2,7 @@
 
 Last updated: 2026-02-19
 Branch: `main`
-Latest commit: `9a27ff6`
+Latest commit: `0a1f192`
 
 ## Sprint: Final MVP Completion
 Tracking mode: small sequential commits with validation after each milestone.
@@ -30,6 +30,10 @@ Tracking mode: small sequential commits with validation after each milestone.
 - Validation snapshot: `VALIDATION_REPORT.md`
 - CLI usability polish:
   - `--verbose` matcher diagnostics to stderr.
+- Landing readiness:
+  - provider-backed waitlist API
+  - `/privacy` and `/terms` pages
+  - metadata/SEO base config
 
 ## Current MVP State
 - `python` scan path: functional
@@ -40,16 +44,15 @@ Tracking mode: small sequential commits with validation after each milestone.
 - landing page: functional with provider-based waitlist persistence support
 
 ## In Progress (Current Milestone)
-1. Landing production readiness
-- [x] Wire waitlist API to configurable provider endpoint
-- [x] Add legal pages (`/privacy`, `/terms`)
-- [x] Add metadata/SEO base config
+1. Distribution readiness
+- [x] Add release dry-run workflow (`npm pack` artifacts)
+- [x] Add release guide (`RELEASE.md`)
+- [x] Expand README usage + troubleshooting
 - [ ] Commit and push milestone
 
 ## Remaining Sprint Milestones
-1. Distribution readiness (npm release workflow + docs)
-2. CI quality gate extension (extra smoke path)
-3. Final MVP checklist sign-off
+1. CI quality gate extension (extra smoke path)
+2. Final MVP checklist sign-off
 
 ## Definition of "MVP Ready for External Beta"
 - Scans Python + TypeScript SDKs with stable JSON output.

@@ -1,0 +1,48 @@
+name: Release Dry Run
+
+on:
+  workflow_dispatch:
+
+jobs:
+  pack:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Test Fixtures
+        run: npm run test:fixtures
+
+      - name: Pack core
+        run: npm pack --workspace @sdkdrift/core
+
+      - name: Pack python-scanner
+        run: npm pack --workspace @sdkdrift/python-scanner
+
+      - name: Pack cli
+        run: npm pack --workspace @sdkdrift/cli
+
+      - name: Collect tarballs
+        run: |
+          mkdir -p release-artifacts
+          find . -maxdepth 3 -name "*.tgz" -exec cp {} release-artifacts/ \;
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdkdrift-release-dry-run
+          path: release-artifacts/*.tgz
