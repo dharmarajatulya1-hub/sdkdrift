@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { Command } from "commander";
 import { readFile, writeFile } from "node:fs/promises";
-import { renderReport, scanWithMethods } from "@sdkdrift/core";
+import { renderReport, scanWithArtifacts } from "@sdkdrift/core";
 import type { MatchOptions } from "@sdkdrift/core";
 import { scanPythonSdk, scanTypeScriptSdk } from "@sdkdrift/python-scanner";
 import { load } from "js-yaml";
@@ -100,6 +100,7 @@ async function run(): Promise<number> {
     .requiredOption("--sdk <path>", "SDK root directory")
     .requiredOption("--lang <python|ts>", "SDK language")
     .option("--format <terminal|json|markdown>", "Report output format", "terminal")
+    .option("--verbose", "Print matcher diagnostics to stderr", false)
     .option("--config <path>", "Path to sdkdrift.config.yaml")
     .option("--out <path>", "Write output to file path")
     .option("--min-score <number>", "Fail if score is below threshold", (v) => Number(v))
@@ -109,7 +110,7 @@ async function run(): Promise<number> {
       const methods =
         lang === "python" ? await scanPythonSdk(args.sdk as string) : await scanTypeScriptSdk(args.sdk as string);
 
-      const report = await scanWithMethods(
+      const artifacts = await scanWithArtifacts(
         {
           specPathOrUrl: args.spec as string,
           sdkPath: args.sdk as string,
@@ -119,6 +120,7 @@ async function run(): Promise<number> {
         },
         methods
       );
+      const { report, matches } = artifacts;
 
       const format = (args.format as "terminal" | "json" | "markdown") ?? "terminal";
       const output = renderReport(report, format);
@@ -127,6 +129,24 @@ async function run(): Promise<number> {
         await writeFile(args.out as string, output, "utf8");
       } else {
         process.stdout.write(`${output}\n`);
+      }
+
+      if (Boolean(args.verbose)) {
+        const strategyCounts = matches.reduce<Record<string, number>>((acc, match) => {
+          acc[match.strategy] = (acc[match.strategy] ?? 0) + 1;
+          return acc;
+        }, {});
+        const unmatched = matches.filter((m) => !m.sdkMethodId).map((m) => m.operationId);
+
+        process.stderr.write(
+          [
+            "[sdkdrift:verbose]",
+            `operations=${report.summary.operationsTotal}`,
+            `methods=${methods.length}`,
+            `strategies=${JSON.stringify(strategyCounts)}`,
+            unmatched.length ? `unmatched=${unmatched.join(",")}` : "unmatched=none"
+          ].join(" ") + "\n"
+        );
       }
 
       if (typeof args.minScore === "number" && report.score < args.minScore) {

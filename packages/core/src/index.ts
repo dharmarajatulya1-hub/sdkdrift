@@ -6,17 +6,26 @@ import { formatMarkdown } from "./reporters/markdown.js";
 import { formatTerminal } from "./reporters/terminal.js";
 import { scoreReport } from "./scoring/score.js";
 import type {
+  MatchResult,
   DriftReport,
+  OperationSurface,
   ScanOptions,
   SdkMethodSurface
 } from "./types/contracts.js";
 
 export * from "./types/contracts.js";
 
-export async function scanWithMethods(
+export interface ScanArtifacts {
+  report: DriftReport;
+  operations: OperationSurface[];
+  methods: SdkMethodSurface[];
+  matches: MatchResult[];
+}
+
+export async function scanWithArtifacts(
   options: ScanOptions,
   methods: SdkMethodSurface[]
-): Promise<DriftReport> {
+): Promise<ScanArtifacts> {
   const operations = await parseOpenApi(options.specPathOrUrl);
   const matches = matchOperations(operations, methods, options.match);
   const findings = computeDiff(operations, methods, matches);
@@ -24,11 +33,30 @@ export async function scanWithMethods(
   const scored = scoreReport(findings, operations.length, matchedCount);
 
   return {
+    operations,
+    methods,
+    matches,
+    report: {
+      version: "1",
+      score: scored.score,
+      summary: scored.summary,
+      deductions: scored.deductions,
+      findings
+    }
+  };
+}
+
+export async function scanWithMethods(
+  options: ScanOptions,
+  methods: SdkMethodSurface[]
+): Promise<DriftReport> {
+  const artifacts = await scanWithArtifacts(options, methods);
+  return {
     version: "1",
-    score: scored.score,
-    summary: scored.summary,
-    deductions: scored.deductions,
-    findings
+    score: artifacts.report.score,
+    summary: artifacts.report.summary,
+    deductions: artifacts.report.deductions,
+    findings: artifacts.report.findings
   };
 }
 
