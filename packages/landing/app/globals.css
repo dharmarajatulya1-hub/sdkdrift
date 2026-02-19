@@ -101,6 +101,18 @@ h1 {
   color: #9f1239;
 }
 
+.footer {
+  display: flex;
+  gap: 14px;
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+
+.footer a {
+  color: var(--muted);
+  font-size: 14px;
+}
+
 @media (max-width: 700px) {
   .waitlist {
     flex-direction: column;

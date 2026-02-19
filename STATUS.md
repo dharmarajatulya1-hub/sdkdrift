@@ -2,7 +2,7 @@
 
 Last updated: 2026-02-19
 Branch: `main`
-Latest commit: `1f5ac4b`
+Latest commit: `9a27ff6`
 
 ## Sprint: Final MVP Completion
 Tracking mode: small sequential commits with validation after each milestone.
@@ -28,6 +28,8 @@ Tracking mode: small sequential commits with validation after each milestone.
   - `SCHEMA.md`
   - `CONFIG_SPEC.md`
 - Validation snapshot: `VALIDATION_REPORT.md`
+- CLI usability polish:
+  - `--verbose` matcher diagnostics to stderr.
 
 ## Current MVP State
 - `python` scan path: functional
@@ -35,18 +37,19 @@ Tracking mode: small sequential commits with validation after each milestone.
 - score + threshold exit code: functional
 - config overrides (`sdkdrift.config.yaml`): functional
 - config schema validation: functional
-- landing page scaffold: functional (provider wiring pending)
+- landing page: functional with provider-based waitlist persistence support
 
 ## In Progress (Current Milestone)
-1. CLI usability polish
-- [x] Add `--verbose` matcher diagnostics
-- [x] Keep JSON output machine-safe with diagnostics to stderr
+1. Landing production readiness
+- [x] Wire waitlist API to configurable provider endpoint
+- [x] Add legal pages (`/privacy`, `/terms`)
+- [x] Add metadata/SEO base config
 - [ ] Commit and push milestone
 
 ## Remaining Sprint Milestones
-1. Landing production readiness (real waitlist persistence + legal/SEO)
-2. Distribution readiness (npm release workflow + docs)
-3. CI quality gate extension (extra smoke path)
+1. Distribution readiness (npm release workflow + docs)
+2. CI quality gate extension (extra smoke path)
+3. Final MVP checklist sign-off
 
 ## Definition of "MVP Ready for External Beta"
 - Scans Python + TypeScript SDKs with stable JSON output.

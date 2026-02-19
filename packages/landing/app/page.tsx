@@ -21,7 +21,7 @@ export default function LandingPage() {
       const response = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email, source: "hero_waitlist" })
       });
       if (!response.ok) throw new Error("Waitlist submission failed");
       setStatus("saved");
@@ -86,6 +86,11 @@ export default function LandingPage() {
           <li>Match, diff, score, and report drift findings</li>
         </ol>
       </section>
+
+      <footer className="footer">
+        <a href="/privacy">Privacy</a>
+        <a href="/terms">Terms</a>
+      </footer>
     </main>
   );
 }

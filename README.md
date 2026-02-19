@@ -45,3 +45,8 @@ node ./packages/cli/dist/cli.js scan \
 2. Improve matcher heuristics and override mappings
 3. Add fixture matrix and automated tests
 4. Build landing page MVP (waitlist-first)
+
+## Landing Env Vars
+- `WAITLIST_WEBHOOK_URL` required for waitlist submissions.
+- `WAITLIST_PROVIDER` optional (`formspree` or `generic`).
+- `NEXT_PUBLIC_SITE_URL` optional canonical URL for metadata.
