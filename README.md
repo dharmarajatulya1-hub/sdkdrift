@@ -34,6 +34,9 @@ node ./packages/cli/dist/cli.js scan \
 - `fixtures` local scan fixtures
 - `tests` smoke and integration test assets
 
+## Project Status
+- Current execution tracker: `STATUS.md`
+
 ## Near-Term Roadmap
 1. Implement TypeScript SDK scanning with `ts-morph`
 2. Improve matcher heuristics and override mappings
