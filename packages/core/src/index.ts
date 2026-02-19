@@ -18,7 +18,7 @@ export async function scanWithMethods(
   methods: SdkMethodSurface[]
 ): Promise<DriftReport> {
   const operations = await parseOpenApi(options.specPathOrUrl);
-  const matches = matchOperations(operations, methods);
+  const matches = matchOperations(operations, methods, options.match);
   const findings = computeDiff(operations, methods, matches);
   const matchedCount = matches.filter((m) => Boolean(m.sdkMethodId)).length;
   const scored = scoreReport(findings, operations.length, matchedCount);

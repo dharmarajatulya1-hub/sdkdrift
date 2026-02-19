@@ -37,6 +37,7 @@ export interface SdkMethodSurface {
   returnType?: TypeSurface;
   visibility: "public" | "private";
   sourceFile?: string;
+  deprecated?: boolean;
 }
 
 export type DriftCategory =
@@ -76,9 +77,15 @@ export interface MatchResult {
   strategy: "exact" | "heuristic" | "override" | "unmatched";
 }
 
+export interface MatchOptions {
+  overrides?: Record<string, string>;
+  heuristicThreshold?: number;
+}
+
 export interface ScanOptions {
   specPathOrUrl: string;
   sdkPath: string;
   language: "python" | "ts";
   minScore?: number;
+  match?: MatchOptions;
 }

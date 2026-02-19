@@ -16,6 +16,7 @@
   "dependencies": {
     "@sdkdrift/core": "file:../core",
     "@sdkdrift/python-scanner": "file:../python-scanner",
-    "commander": "^14.0.1"
+    "commander": "^14.0.1",
+    "js-yaml": "^4.1.0"
   }
 }

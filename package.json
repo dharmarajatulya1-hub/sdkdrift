@@ -10,6 +10,7 @@
     "build": "npm run --workspace @sdkdrift/core build && npm run --workspace @sdkdrift/python-scanner build && npm run --workspace @sdkdrift/cli build && npm run --workspace @sdkdrift/landing build",
     "typecheck": "npm run --workspace @sdkdrift/core typecheck && npm run --workspace @sdkdrift/python-scanner typecheck && npm run --workspace @sdkdrift/cli typecheck && npm run --workspace @sdkdrift/landing typecheck",
     "test": "npm run --workspaces test",
+    "test:fixtures": "node ./tests/run-fixtures.mjs",
     "lint": "npm run --workspaces lint",
     "smoke:cli": "node ./packages/cli/dist/cli.js scan --spec ./fixtures/simple/openapi.yaml --sdk ./fixtures/simple/sdk/python --lang python --format terminal",
     "smoke:cli:json": "node ./packages/cli/dist/cli.js scan --spec ./fixtures/simple/openapi.yaml --sdk ./fixtures/simple/sdk/python --lang python --format json --out ./tests/smoke-report.json"

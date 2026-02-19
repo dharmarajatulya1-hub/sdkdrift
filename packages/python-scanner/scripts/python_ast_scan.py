@@ -6,6 +6,25 @@ import sys
 from typing import Any, Dict, List
 
 
+def annotation_to_text(node: Any) -> str:
+    if node is None:
+        return "unknown"
+    if isinstance(node, ast.Name):
+        return node.id
+    if isinstance(node, ast.Attribute):
+        return f"{annotation_to_text(node.value)}.{node.attr}"
+    if isinstance(node, ast.Subscript):
+        return f"{annotation_to_text(node.value)}[{annotation_to_text(node.slice)}]"
+    if isinstance(node, ast.Constant):
+        return str(node.value)
+    if hasattr(ast, "unparse"):
+        try:
+            return ast.unparse(node)
+        except Exception:
+            return "unknown"
+    return "unknown"
+
+
 def scan_file(path: str) -> List[Dict[str, Any]]:
     with open(path, "r", encoding="utf-8") as f:
         source = f.read()
@@ -27,7 +46,10 @@ def scan_file(path: str) -> List[Dict[str, Any]]:
                         params.append({
                             "name": arg.arg,
                             "in": "query",
-                            "required": True
+                            "required": True,
+                            "type": {
+                                "name": annotation_to_text(arg.annotation)
+                            }
                         })
                     methods.append({
                         "id": f"{namespace}.{item.name}",

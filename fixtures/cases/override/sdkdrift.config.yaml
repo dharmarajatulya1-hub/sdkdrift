@@ -1,0 +1,6 @@
+mapping:
+  overrides:
+    - operationId: listUsers
+      sdkMethod: UsersApi.fetch_users
+match:
+  heuristicThreshold: 0.9

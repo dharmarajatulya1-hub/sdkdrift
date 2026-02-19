@@ -1,7 +1,8 @@
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import type { SdkMethodSurface } from "@sdkdrift/core";
+import { Project, Scope } from "ts-morph";
 
 export async function scanPythonSdk(sdkPath: string): Promise<SdkMethodSurface[]> {
   const scriptPath = join(dirname(fileURLToPath(import.meta.url)), "..", "scripts", "python_ast_scan.py");
@@ -40,5 +41,61 @@ export async function scanPythonSdk(sdkPath: string): Promise<SdkMethodSurface[]
 
 // Placeholder until ts-morph scanner package is introduced.
 export async function scanTypeScriptSdk(_sdkPath: string): Promise<SdkMethodSurface[]> {
-  return [];
+  const project = new Project({
+    skipAddingFilesFromTsConfig: true
+  });
+  const normalized = _sdkPath.replace(/\\/g, "/");
+  project.addSourceFilesAtPaths(`${normalized}/**/*.ts`);
+
+  const output: SdkMethodSurface[] = [];
+  for (const sourceFile of project.getSourceFiles()) {
+    const filePath = sourceFile.getFilePath();
+    if (filePath.endsWith(".d.ts")) continue;
+    if (/(^|\/)(test|tests|__tests__)\//.test(filePath)) continue;
+
+    for (const classDecl of sourceFile.getClasses()) {
+      if (!classDecl.isExported()) continue;
+      const namespace = classDecl.getName() ?? basename(filePath, ".ts");
+      for (const method of classDecl.getMethods()) {
+        if (method.getScope() === Scope.Private || method.getName().startsWith("_")) continue;
+        output.push({
+          id: `${namespace}.${method.getName()}`,
+          namespace,
+          methodName: method.getName(),
+          params: method.getParameters().map((param) => ({
+            name: param.getName(),
+            in: "query",
+            required: !param.isOptional(),
+            type: { name: param.getType().getText(param) }
+          })),
+          returnType: { name: method.getReturnType().getText(method) },
+          visibility: "public",
+          sourceFile: filePath
+        });
+      }
+    }
+
+    for (const fn of sourceFile.getFunctions()) {
+      if (!fn.isExported()) continue;
+      const namespace = basename(filePath, ".ts");
+      const methodName = fn.getName();
+      if (!methodName || methodName.startsWith("_")) continue;
+      output.push({
+        id: `${namespace}.${methodName}`,
+        namespace,
+        methodName,
+        params: fn.getParameters().map((param) => ({
+          name: param.getName(),
+          in: "query",
+          required: !param.isOptional(),
+          type: { name: param.getType().getText(param) }
+        })),
+        returnType: { name: fn.getReturnType().getText(fn) },
+        visibility: "public",
+        sourceFile: filePath
+      });
+    }
+  }
+
+  return output;
 }

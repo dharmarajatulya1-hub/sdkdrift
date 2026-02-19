@@ -1,9 +1,28 @@
 import type {
+  DriftCategory,
   DriftFinding,
   MatchResult,
   OperationSurface,
   SdkMethodSurface
 } from "../types/contracts.js";
+
+function hasParam(method: SdkMethodSurface, name: string): boolean {
+  return method.params.some((param) => param.name.toLowerCase() === name.toLowerCase());
+}
+
+function findParam(method: SdkMethodSurface, name: string) {
+  return method.params.find((param) => param.name.toLowerCase() === name.toLowerCase());
+}
+
+function normalizeType(value?: string): string {
+  return (value ?? "unknown").toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function severityFor(category: DriftCategory): DriftFinding["severity"] {
+  if (category === "missing_endpoint" || category === "required_field_added") return "high";
+  if (category === "type_mismatch" || category === "changed_param") return "medium";
+  return "low";
+}
 
 export function computeDiff(
   operations: OperationSurface[],
@@ -22,6 +41,54 @@ export function computeDiff(
         message: `Operation ${match.operationId} is not represented in SDK`,
         remediation: "Add or regenerate corresponding SDK method"
       });
+      continue;
+    }
+
+    const operation = operations.find((op) => op.operationId === match.operationId);
+    const method = methods.find((m) => m.id === match.sdkMethodId);
+    if (!operation || !method) continue;
+
+    const specParams = [...operation.pathParams, ...operation.queryParams];
+    for (const specParam of specParams) {
+      const sdkParam = findParam(method, specParam.name);
+      if (!sdkParam && specParam.required) {
+        findings.push({
+          id: `required_${operation.operationId}_${specParam.name}`,
+          category: "required_field_added",
+          severity: severityFor("required_field_added"),
+          operationId: operation.operationId,
+          sdkMethodId: method.id,
+          message: `Required parameter ${specParam.name} is missing in SDK method ${method.methodName}`,
+          remediation: "Regenerate SDK or add missing required parameter"
+        });
+        continue;
+      }
+
+      if (!sdkParam) {
+        findings.push({
+          id: `changed_${operation.operationId}_${specParam.name}`,
+          category: "changed_param",
+          severity: severityFor("changed_param"),
+          operationId: operation.operationId,
+          sdkMethodId: method.id,
+          message: `Parameter ${specParam.name} exists in spec but not in SDK method signature`
+        });
+        continue;
+      }
+
+      const specType = normalizeType(specParam.type?.name ?? specParam.type?.raw);
+      const sdkType = normalizeType(sdkParam.type?.name ?? sdkParam.type?.raw);
+      if (specType !== "unknown" && sdkType !== "unknown" && specType !== sdkType) {
+        findings.push({
+          id: `type_${operation.operationId}_${specParam.name}`,
+          category: "type_mismatch",
+          severity: severityFor("type_mismatch"),
+          operationId: operation.operationId,
+          sdkMethodId: method.id,
+          message: `Type mismatch for ${specParam.name}: spec=${specType}, sdk=${sdkType}`,
+          remediation: "Update SDK parameter type to match OpenAPI schema"
+        });
+      }
     }
   }
 
