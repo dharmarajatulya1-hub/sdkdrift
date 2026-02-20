@@ -133,11 +133,12 @@ jobs:
 - `RELEASE_NOTES_v0.2.0.md`: release notes
 
 ## Landing Environment Variables
-- `WAITLIST_WEBHOOK_URL` (required): waitlist sink endpoint
-- `WAITLIST_PROVIDER` (optional): `formspree` or `generic`
+- `SUPABASE_URL` (required): Supabase project URL
+- `SUPABASE_SERVICE_ROLE_KEY` (required): service role key used by API route
+- `SUPABASE_WAITLIST_TABLE` (optional): table name (default `waitlist_signups`)
 - `NEXT_PUBLIC_SITE_URL` (optional): canonical site URL for metadata
 
 ## Troubleshooting
 - Config errors: validate `sdkdrift.config.yaml` against `CONFIG_SPEC.md`
 - No CLI updates after changes: rebuild or reinstall package
-- Waitlist failures: confirm `WAITLIST_WEBHOOK_URL` is set in Vercel project env vars
+- Waitlist failures: confirm Supabase env vars are set in Vercel project env vars

@@ -1,11 +1,11 @@
 :root {
-  --bg: #f3efe5;
-  --ink: #171b1f;
-  --muted: #5f6772;
-  --panel: #fff9eb;
-  --line: #d8d4c8;
-  --brand: #0f766e;
-  --brand-dark: #0a4f4a;
+  --bg: #e8edf5;
+  --ink: #0f1723;
+  --muted: #4f5a69;
+  --panel: rgba(255, 255, 255, 0.56);
+  --line: rgba(255, 255, 255, 0.45);
+  --brand: #0a8f8c;
+  --brand-dark: #0a5560;
 }
 
 * {
@@ -22,9 +22,10 @@ body {
   font-family: "Space Grotesk", "Avenir Next", sans-serif;
   color: var(--ink);
   background:
-    radial-gradient(circle at 8% 12%, #ffe9c7 0, transparent 28%),
-    radial-gradient(circle at 85% 8%, #caeee9 0, transparent 25%),
-    linear-gradient(180deg, #fff8eb 0%, var(--bg) 65%);
+    radial-gradient(circle at 8% 12%, #f9c5e1 0, transparent 31%),
+    radial-gradient(circle at 85% 8%, #b7f1ee 0, transparent 29%),
+    radial-gradient(circle at 50% 92%, #bdd6ff 0, transparent 34%),
+    linear-gradient(165deg, #f7fbff 0%, var(--bg) 100%);
   min-height: 100vh;
 }
 
@@ -64,7 +65,11 @@ body {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 22px;
-  box-shadow: 0 16px 38px rgba(21, 29, 37, 0.08);
+  box-shadow:
+    0 20px 40px rgba(12, 26, 42, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(18px) saturate(130%);
+  -webkit-backdrop-filter: blur(18px) saturate(130%);
 }
 
 .hero {
@@ -103,20 +108,33 @@ h1 {
 .waitlist input {
   flex: 1;
   min-width: 260px;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(255, 255, 255, 0.75);
   border-radius: 12px;
   padding: 12px;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.75);
 }
 
 .waitlist button {
-  border: 0;
-  border-radius: 12px;
-  padding: 12px 16px;
-  background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 999px;
+  padding: 12px 20px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0)),
+    linear-gradient(135deg, var(--brand), var(--brand-dark));
   color: #fff;
   font-weight: 700;
   cursor: pointer;
+  box-shadow:
+    0 10px 25px rgba(8, 85, 96, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.waitlist button:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 14px 28px rgba(8, 85, 96, 0.43),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
 .ctas {
@@ -139,12 +157,13 @@ pre {
 }
 
 .ctas code {
-  background: #1f2937;
-  color: #ecfeff;
+  background: rgba(16, 24, 32, 0.9);
+  color: #e7fffd;
   border-radius: 10px;
   padding: 8px 10px;
   font-size: 13px;
   cursor: pointer;
+  border: 1px solid rgba(166, 255, 247, 0.22);
 }
 
 .grid3 {
@@ -193,9 +212,9 @@ pre {
   overflow: auto;
   border-radius: 14px;
   padding: 14px;
-  background: #101418;
-  color: #d1fae5;
-  border: 1px solid #21303b;
+  background: rgba(8, 14, 23, 0.88);
+  color: #d8ffef;
+  border: 1px solid rgba(187, 255, 241, 0.2);
   font-size: 12px;
   line-height: 1.45;
 }
