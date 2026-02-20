@@ -106,6 +106,16 @@ def scan_file(path: str, root: str) -> List[Dict[str, Any]]:
                                 "name": annotation_to_text(arg.annotation)
                             }
                         })
+
+                    if item.args.kwarg is not None:
+                        params.append({
+                            "name": item.args.kwarg.arg,
+                            "in": "query",
+                            "required": False,
+                            "type": {
+                                "name": "dict"
+                            }
+                        })
                     methods.append({
                         "id": f"{module_name}:{namespace}.{item.name}",
                         "namespace": namespace,

@@ -54,6 +54,7 @@ export async function scanWithArtifacts(
         unmatchedReasons
       },
       deductions: scored.deductions,
+      weightedDeductions: scored.weightedDeductions,
       findings,
       actionableFindings,
       coverageNotes
@@ -71,6 +72,7 @@ export async function scanWithMethods(
     score: artifacts.report.score,
     summary: artifacts.report.summary,
     deductions: artifacts.report.deductions,
+    weightedDeductions: artifacts.report.weightedDeductions,
     findings: artifacts.report.findings,
     actionableFindings: artifacts.report.actionableFindings,
     coverageNotes: artifacts.report.coverageNotes

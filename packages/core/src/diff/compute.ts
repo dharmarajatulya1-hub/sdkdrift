@@ -107,9 +107,23 @@ function usesParameterBag(method: SdkMethodSurface): boolean {
   });
 }
 
+function hasDynamicParamSupport(method: SdkMethodSurface): boolean {
+  return method.params.some((param) => {
+    const name = normalizeParamName(param.name);
+    const type = normalizeType(param.type?.name ?? param.type?.raw);
+    const dynamicNameHints = ["kwargs", "kwarg", "params", "options", "request", "extra", "input", "data"];
+    const dynamicTypeHints = ["object", "dict", "map", "record", "any", "unknown"];
+    return (
+      dynamicNameHints.some((hint) => name.includes(hint)) ||
+      dynamicTypeHints.some((hint) => type.includes(hint))
+    );
+  });
+}
+
 function severityFor(category: DriftCategory): DriftFinding["severity"] {
   if (category === "missing_endpoint" || category === "required_field_added") return "high";
   if (category === "unsupported_resource") return "medium";
+  if (category === "param_not_explicit") return "low";
   if (category === "type_mismatch" || category === "changed_param") return "medium";
   return "low";
 }
@@ -164,16 +178,42 @@ function buildSdkVocabulary(methods: SdkMethodSurface[]): Set<string> {
 }
 
 function remediationFor(category: DriftCategory, highConfidence: boolean): string | undefined {
-  if (!highConfidence) {
-    if (category === "unsupported_resource") {
-      return "Verify SDK/version coverage for this API resource before treating as drift.";
-    }
-    return "Review spec and SDK version alignment; this finding may be affected by heuristic matching.";
+  if (category === "unsupported_resource") {
+    return "This API group does not appear in the current SDK surface.";
   }
-  if (category === "missing_endpoint") return "Add or regenerate corresponding SDK method";
-  if (category === "required_field_added") return "Regenerate SDK or add missing required parameter";
-  if (category === "type_mismatch") return "Update SDK parameter type to match OpenAPI schema";
+  if (category === "param_not_explicit") {
+    return "Parameter may be handled via kwargs/params helper objects; verify runtime behavior before treating as drift.";
+  }
+  if (!highConfidence) {
+    if (category === "missing_endpoint") {
+      return "No matching SDK method detected for this operation. Confirm SDK coverage or regenerate from updated OpenAPI spec.";
+    }
+    return "Potential mapping mismatch detected. Confirm SDK/spec alignment for this operation.";
+  }
+  if (category === "missing_endpoint") {
+    return "No matching SDK method detected for this operation. Confirm SDK coverage or regenerate from updated OpenAPI spec.";
+  }
+  if (category === "required_field_added") return "Required parameter appears missing from SDK surface. Regenerate or patch SDK signature.";
+  if (category === "type_mismatch") return "Parameter type differs between SDK and OpenAPI. Update SDK typing or reconcile spec.";
   return undefined;
+}
+
+function confidenceForFinding(
+  category: DriftCategory,
+  match: MatchResult,
+  highConfidence: boolean
+): number {
+  if (match.strategy === "unmatched") {
+    if (match.unmatchedReason === "no_matching_resource_in_sdk") return 0.93;
+    if (match.unmatchedReason === "no_matching_action_in_resource") return 0.78;
+    if (match.unmatchedReason === "path_based_match_available") return 0.52;
+    return 0.4;
+  }
+
+  const base = match.strategy === "exact" || match.strategy === "override" ? 0.96 : match.confidence || 0.7;
+  if (category === "param_not_explicit") return Math.max(0.35, Math.min(0.65, base * 0.75));
+  if (!highConfidence) return Math.max(0.45, Math.min(0.75, base * 0.85));
+  return Math.max(0.55, Math.min(0.99, base));
 }
 
 export function computeDiff(
@@ -197,6 +237,7 @@ export function computeDiff(
         id: `missing_${match.operationId}`,
         category,
         severity: severityFor(category),
+        confidence: confidenceForFinding(category, match, isHighConfidence),
         operationId: match.operationId,
         message:
           category === "unsupported_resource"
@@ -210,6 +251,7 @@ export function computeDiff(
     const operation = operations.find((op) => op.operationId === match.operationId);
     const method = methods.find((m) => m.id === match.sdkMethodId);
     if (!operation || !method) continue;
+    const dynamicParams = hasDynamicParamSupport(method);
     if (usesParameterBag(method)) continue;
 
     const specParams = [...operation.pathParams, ...operation.queryParams];
@@ -220,6 +262,7 @@ export function computeDiff(
           id: `required_${operation.operationId}_${specParam.name}`,
           category: "required_field_added",
           severity: severityFor("required_field_added"),
+          confidence: confidenceForFinding("required_field_added", match, isHighConfidence),
           operationId: operation.operationId,
           sdkMethodId: method.id,
           message: `Required parameter ${specParam.name} is missing in SDK method ${method.methodName}`,
@@ -229,13 +272,18 @@ export function computeDiff(
       }
 
       if (!sdkParam) {
+        const category: DriftCategory = dynamicParams ? "param_not_explicit" : "changed_param";
         findings.push({
           id: `changed_${operation.operationId}_${specParam.name}`,
-          category: "changed_param",
-          severity: severityFor("changed_param"),
+          category,
+          severity: severityFor(category),
+          confidence: confidenceForFinding(category, match, isHighConfidence),
           operationId: operation.operationId,
           sdkMethodId: method.id,
-          message: `Parameter ${specParam.name} exists in spec but not in SDK method signature`
+          message: dynamicParams
+            ? `Parameter ${specParam.name} is not explicit in SDK signature and may be handled dynamically`
+            : `Parameter ${specParam.name} exists in spec but not in SDK method signature`,
+          remediation: remediationFor(category, isHighConfidence)
         });
         continue;
       }
@@ -247,6 +295,7 @@ export function computeDiff(
           id: `type_${operation.operationId}_${specParam.name}`,
           category: "type_mismatch",
           severity: severityFor("type_mismatch"),
+          confidence: confidenceForFinding("type_mismatch", match, isHighConfidence),
           operationId: operation.operationId,
           sdkMethodId: method.id,
           message: `Type mismatch for ${specParam.name}: spec=${specType}, sdk=${sdkType}`,
@@ -263,6 +312,7 @@ export function computeDiff(
         id: `extra_${method.id}`,
         category: "extra_sdk_method",
         severity: "low",
+        confidence: 0.7,
         sdkMethodId: method.id,
         message: `SDK method ${method.methodName} has no matched OpenAPI operation`
       });
@@ -274,6 +324,7 @@ export function computeDiff(
       id: "empty_spec",
       category: "missing_endpoint",
       severity: "critical",
+      confidence: 1,
       message: "No operations found in parsed OpenAPI document",
       remediation: "Validate the OpenAPI file and ensure paths are present"
     });

@@ -175,6 +175,14 @@ runCase({
 });
 
 runCase({
+  name: "param-not-explicit",
+  spec: "./fixtures/cases/param-not-explicit/openapi.yaml",
+  sdk: "./fixtures/cases/param-not-explicit/sdk/python",
+  lang: "python",
+  expectedCategories: ["param_not_explicit"]
+});
+
+runCase({
   name: "unsupported-resource",
   spec: "./fixtures/cases/unsupported-resource/openapi.yaml",
   sdk: "./fixtures/cases/unsupported-resource/sdk/python",

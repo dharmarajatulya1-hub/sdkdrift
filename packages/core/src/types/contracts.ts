@@ -43,6 +43,7 @@ export interface SdkMethodSurface {
 export type DriftCategory =
   | "missing_endpoint"
   | "unsupported_resource"
+  | "param_not_explicit"
   | "changed_param"
   | "required_field_added"
   | "type_mismatch"
@@ -53,6 +54,7 @@ export interface DriftFinding {
   id: string;
   category: DriftCategory;
   severity: "critical" | "high" | "medium" | "low";
+  confidence?: number;
   operationId?: string;
   sdkMethodId?: string;
   message: string;
@@ -71,6 +73,7 @@ export interface DriftReport {
     unmatchedReasons?: Partial<Record<UnmatchedReason, number>>;
   };
   deductions: Partial<Record<DriftCategory, number>>;
+  weightedDeductions?: Partial<Record<DriftCategory, number>>;
   findings: DriftFinding[];
   actionableFindings?: DriftFinding[];
   coverageNotes?: DriftFinding[];

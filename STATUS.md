@@ -2,7 +2,7 @@
 
 Last updated: 2026-02-20
 Branch: `main`
-Latest commit: `c8f8226` (report classification hardening in working tree)
+Latest commit: `caf001c` (final confidence/reporting refinements in working tree)
 
 ## Current Focus
 Launch readiness pass.
@@ -28,6 +28,9 @@ Launch readiness pass.
 - [x] Add unmatched-reason counters in report summary (`no_matching_resource_in_sdk`, etc.)
 - [x] Add second-pass path+method fallback matcher for unmatched operations
 - [x] Split report output into `actionableFindings` and `coverageNotes` (while keeping `findings` for compatibility)
+- [x] Expose user-facing deduction counts (weighted penalties kept in `weightedDeductions` for score math)
+- [x] Add `param_not_explicit` downgrade for dynamic param surfaces (`**kwargs`/params objects)
+- [x] Add per-finding confidence values in JSON report
 - [ ] Complete Stripe Node real-world parsing support (`StripeResource.extend(...)` pattern)
 
 ## Validation Snapshot (baseline -> post2)
@@ -52,6 +55,19 @@ Launch readiness pass.
     - `actionableFindingsTotal`: `53`
     - `coverageNotesTotal`: `228`
     - `unmatchedReasons`: `no_matching_resource_in_sdk=50`, `no_matching_action_in_resource=25`, `path_based_match_available=12`
+
+## OpenAI Latest Refinement Delta
+- Compared to the previous `69`-score output:
+  - score `69 -> 71`
+  - matched stays `150/237` (no overmatching introduced)
+  - `changed_param -> param_not_explicit`: `14 -> 0` / `0 -> 14` (downgraded noise)
+  - `deductions` now reports counts:
+    - `missing_endpoint: 23`
+    - `unsupported_resource: 64`
+    - `required_field_added: 16`
+    - `param_not_explicit: 14`
+    - `extra_sdk_method: 164`
+  - `weightedDeductions` is retained for score internals (`missing_endpoint` weighted value still `184`)
 
 ## Verification Checks Run
 - `npm run build`
