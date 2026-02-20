@@ -69,11 +69,11 @@ export default function LandingPage() {
           </a>
           <code
             onClick={() => {
-              void navigator.clipboard.writeText("npm run smoke:cli");
+              void navigator.clipboard.writeText("npx @sdkdrift/cli scan --help");
               track("copy_install_clicked", { location: "hero" });
             }}
           >
-            npm run smoke:cli
+            npx @sdkdrift/cli scan --help
           </code>
         </div>
       </section>

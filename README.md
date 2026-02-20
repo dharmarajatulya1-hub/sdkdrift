@@ -17,9 +17,14 @@ npm run build
 npm run smoke:cli
 ```
 
+## Install From npm
+```bash
+npx @sdkdrift/cli scan --help
+```
+
 ## CLI Example
 ```bash
-node ./packages/cli/dist/cli.js scan \
+npx @sdkdrift/cli scan \
   --spec ./fixtures/simple/openapi.yaml \
   --sdk ./fixtures/simple/sdk/python \
   --lang python \
@@ -38,7 +43,7 @@ mapping:
 ```
 
 ```bash
-node ./packages/cli/dist/cli.js scan \
+npx @sdkdrift/cli scan \
   --spec ./fixtures/cases/override/openapi.yaml \
   --sdk ./fixtures/cases/override/sdk/python \
   --lang python \
@@ -48,7 +53,7 @@ node ./packages/cli/dist/cli.js scan \
 
 ## Verbose Diagnostics
 ```bash
-node ./packages/cli/dist/cli.js scan \
+npx @sdkdrift/cli scan \
   --verbose \
   --spec ./fixtures/simple/openapi.yaml \
   --sdk ./fixtures/simple/sdk/python \
@@ -76,6 +81,21 @@ Verbose diagnostics are written to stderr and include strategy counts and unmatc
 ## Package Release
 - Dry-run/package workflows are in `.github/workflows/release-dry-run.yml` and `.github/workflows/publish.yml`.
 - Set `NPM_TOKEN` in GitHub repository secrets before real publish.
+
+## CI Example
+```yaml
+name: SDK Drift Check
+on: [push]
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npx @sdkdrift/cli scan --spec ./openapi.yaml --sdk ./sdk/python --lang python --min-score 90
+```
 
 ## Near-Term Roadmap
 1. Implement TypeScript SDK scanning with `ts-morph`
