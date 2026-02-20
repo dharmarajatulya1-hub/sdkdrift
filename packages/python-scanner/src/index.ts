@@ -48,14 +48,29 @@ export async function scanTypeScriptSdk(_sdkPath: string): Promise<SdkMethodSurf
   project.addSourceFilesAtPaths(`${normalized}/**/*.ts`);
 
   const output: SdkMethodSurface[] = [];
+  const verbPrefixes = ["get", "list", "create", "update", "delete", "post", "put", "patch", "retrieve", "remove"];
+
+  function shouldIncludeClass(filePath: string, className: string | undefined, exported: boolean): boolean {
+    if (!className) return false;
+    if (className.endsWith("Api")) return true;
+    if (filePath.includes("/api/")) return true;
+    if (filePath.includes("/src/resources/")) return true;
+    return exported;
+  }
+
+  function shouldIncludeFunction(filePath: string, fnName: string): boolean {
+    if (filePath.includes("/api/") || filePath.includes("/src/resources/")) return true;
+    return verbPrefixes.some((prefix) => fnName.toLowerCase().startsWith(prefix));
+  }
+
   for (const sourceFile of project.getSourceFiles()) {
     const filePath = sourceFile.getFilePath();
     if (filePath.endsWith(".d.ts")) continue;
     if (/(^|\/)(test|tests|__tests__)\//.test(filePath)) continue;
 
     for (const classDecl of sourceFile.getClasses()) {
-      if (!classDecl.isExported()) continue;
       const namespace = classDecl.getName() ?? basename(filePath, ".ts");
+      if (!shouldIncludeClass(filePath, classDecl.getName(), classDecl.isExported())) continue;
       for (const method of classDecl.getMethods()) {
         if (method.getScope() === Scope.Private || method.getName().startsWith("_")) continue;
         output.push({
@@ -80,6 +95,7 @@ export async function scanTypeScriptSdk(_sdkPath: string): Promise<SdkMethodSurf
       const namespace = basename(filePath, ".ts");
       const methodName = fn.getName();
       if (!methodName || methodName.startsWith("_")) continue;
+      if (!shouldIncludeFunction(filePath, methodName)) continue;
       output.push({
         id: `${namespace}.${methodName}`,
         namespace,

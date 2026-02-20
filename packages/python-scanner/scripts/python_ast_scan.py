@@ -35,18 +35,51 @@ def scan_file(path: str) -> List[Dict[str, Any]]:
     for node in tree.body:
         if isinstance(node, ast.ClassDef):
             namespace = node.name
+            lowered_path = path.lower()
+            base_names: List[str] = []
+            for base in node.bases:
+                base_text = annotation_to_text(base)
+                if base_text:
+                    base_names.append(base_text)
+            lowered_bases = [base.lower() for base in base_names]
+
+            is_api_class = (
+                namespace.endswith("Api")
+                or namespace.endswith("API")
+                or namespace.endswith("Service")
+                or "/api/" in lowered_path
+                or any("apiresource" in base for base in lowered_bases)
+                or any(base.endswith("service") for base in lowered_bases)
+                or any(base.endswith("api") for base in lowered_bases)
+            )
+            if not is_api_class:
+                continue
             for item in node.body:
                 if isinstance(item, ast.FunctionDef):
                     if item.name.startswith("_"):
                         continue
                     params = []
+                    positional_args = [arg for arg in item.args.args if arg.arg != "self"]
+                    required_cutoff = len(positional_args) - len(item.args.defaults)
                     for arg in item.args.args:
                         if arg.arg == "self":
                             continue
+                        position = len(params)
                         params.append({
                             "name": arg.arg,
                             "in": "query",
-                            "required": True,
+                            "required": position < required_cutoff,
+                            "type": {
+                                "name": annotation_to_text(arg.annotation)
+                            }
+                        })
+
+                    for idx, arg in enumerate(item.args.kwonlyargs):
+                        required = item.args.kw_defaults[idx] is None
+                        params.append({
+                            "name": arg.arg,
+                            "in": "query",
+                            "required": required,
                             "type": {
                                 "name": annotation_to_text(arg.annotation)
                             }

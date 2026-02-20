@@ -6,11 +6,16 @@ function normalize(value: string): string {
 
 function toTokens(value: string): string[] {
   return value
+    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2")
     .replace(/([a-z])([A-Z])/g, "$1 $2")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, " ")
     .split(" ")
     .filter(Boolean);
+}
+
+function normalizeParamName(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
 function tokenVariants(token: string): string[] {
@@ -73,14 +78,17 @@ function candidateScore(operation: OperationSurface, method: SdkMethodSurface): 
   const methodTokens = expandTokens([...toTokens(method.namespace), ...toTokens(method.methodName)]);
   const tokenScore = overlapScore(opTokens, methodTokens);
 
-  const specParams = [...operation.pathParams, ...operation.queryParams].map((p) => p.name.toLowerCase());
-  const sdkParams = method.params.map((p) => p.name.toLowerCase());
+  const specParams = [...operation.pathParams, ...operation.queryParams].map((p) => normalizeParamName(p.name));
+  const sdkParams = method.params.map((p) => normalizeParamName(p.name));
   const paramScore = specParams.length ? overlapScore(specParams, sdkParams) : 0.5;
   const verbTokens = methodVerbHints(operation.method);
   const hasVerbSignal = methodTokens.some((token) => verbTokens.includes(token));
   const verbBoost = hasVerbSignal ? 0.1 : 0;
+  const pathTokenSet = new Set(pathTokens(operation.path));
+  const namespaceTokens = toTokens(method.namespace);
+  const namespacePathBoost = namespaceTokens.some((token) => pathTokenSet.has(token)) ? 0.05 : 0;
 
-  return tokenScore * 0.7 + paramScore * 0.2 + verbBoost;
+  return tokenScore * 0.65 + paramScore * 0.2 + verbBoost + namespacePathBoost;
 }
 
 export function matchOperations(

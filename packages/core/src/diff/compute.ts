@@ -1,7 +1,12 @@
 import type { DriftCategory, DriftFinding, MatchResult, OperationSurface, SdkMethodSurface } from "../types/contracts.js";
 
+function normalizeParamName(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
 function findParam(method: SdkMethodSurface, name: string) {
-  return method.params.find((param) => param.name.toLowerCase() === name.toLowerCase());
+  const target = normalizeParamName(name);
+  return method.params.find((param) => normalizeParamName(param.name) === target);
 }
 
 function normalizeType(value?: string): string {
@@ -9,6 +14,10 @@ function normalizeType(value?: string): string {
   let v = value.toLowerCase().trim();
 
   v = v.replace(/\s+/g, "");
+  v = v.replace(/^annotated\[(.+)\]$/, "$1");
+  v = v.replace(/^optional\[(.+)\]$/, "$1");
+  v = v.replace(/^union\[(.+)\]$/, "$1");
+  v = v.replace(/^literal\[(.+)\]$/, "$1");
   v = v.replace(/\|undefined|\|null/g, "");
   v = v.replace(/^promise<(.+)>$/, "$1");
   v = v.replace(/^readonlyarray<(.+)>$/, "$1[]");
@@ -42,7 +51,27 @@ function normalizeType(value?: string): string {
   };
 
   if (alnum.endsWith("[]")) return "array";
+  if (alnum.startsWith("strictstr") || alnum.startsWith("str")) return "string";
+  if (alnum.startsWith("int") || alnum.startsWith("number") || alnum.includes("intfield")) return "number";
+  if (alnum.startsWith("float") || alnum.startsWith("double") || alnum.startsWith("decimal")) return "number";
+  if (alnum.startsWith("bool")) return "boolean";
+  if (alnum.startsWith("dict") || alnum.startsWith("map") || alnum.startsWith("record") || alnum.startsWith("object")) {
+    return "object";
+  }
   return aliases[alnum] ?? alnum;
+}
+
+function usesParameterBag(method: SdkMethodSurface): boolean {
+  if (method.params.length === 0) return false;
+  if (method.params.length > 2) return false;
+  return method.params.some((param) => {
+    const name = normalizeParamName(param.name);
+    const type = normalizeType(param.type?.name ?? param.type?.raw);
+    const looksLikeBagName =
+      name.includes("request") || name.includes("params") || name.includes("options") || name.includes("input");
+    const looksLikeBagType = type.includes("request") || type.includes("param") || type.includes("option");
+    return looksLikeBagName || looksLikeBagType;
+  });
 }
 
 function severityFor(category: DriftCategory): DriftFinding["severity"] {
@@ -74,6 +103,7 @@ export function computeDiff(
     const operation = operations.find((op) => op.operationId === match.operationId);
     const method = methods.find((m) => m.id === match.sdkMethodId);
     if (!operation || !method) continue;
+    if (usesParameterBag(method)) continue;
 
     const specParams = [...operation.pathParams, ...operation.queryParams];
     for (const specParam of specParams) {

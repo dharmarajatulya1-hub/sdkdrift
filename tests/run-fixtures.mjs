@@ -127,6 +127,22 @@ runCase({
 });
 
 runCase({
+  name: "param-casing",
+  spec: "./fixtures/cases/param-casing/openapi.yaml",
+  sdk: "./fixtures/cases/param-casing/sdk/ts",
+  lang: "ts",
+  expectedScore: 100
+});
+
+runCase({
+  name: "python-annotated",
+  spec: "./fixtures/cases/python-annotated/openapi.yaml",
+  sdk: "./fixtures/cases/python-annotated/sdk/python",
+  lang: "python",
+  expectedScore: 100
+});
+
+runCase({
   name: "threshold-exit",
   spec: "./fixtures/cases/missing-endpoint/openapi.yaml",
   sdk: "./fixtures/cases/missing-endpoint/sdk/python",
