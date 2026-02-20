@@ -1,0 +1,17 @@
+openapi: 3.0.3
+info:
+  title: Path Fallback Case
+  version: 1.0.0
+paths:
+  /widgets/{widget_id}/cancel:
+    post:
+      operationId: op123
+      parameters:
+        - name: widget_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ok

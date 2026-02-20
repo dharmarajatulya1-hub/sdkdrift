@@ -1,4 +1,4 @@
-import type { MatchOptions, MatchResult, OperationSurface, SdkMethodSurface } from "../types/contracts.js";
+import type { MatchOptions, MatchResult, OperationSurface, SdkMethodSurface, UnmatchedReason } from "../types/contracts.js";
 
 function normalize(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -16,6 +16,13 @@ function toTokens(value: string): string[] {
 
 function normalizeParamName(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function singularizeToken(token: string): string {
+  if (token.endsWith("ies") && token.length > 3) return `${token.slice(0, -3)}y`;
+  if (token.endsWith("es") && token.length > 4) return token.slice(0, -2);
+  if (token.endsWith("s") && token.length > 3) return token.slice(0, -1);
+  return token;
 }
 
 const actionGroups: Record<string, readonly string[]> = {
@@ -47,6 +54,15 @@ const ignoredSourcePathTokens = new Set([
   "python",
   "typescript",
   "openai"
+]);
+
+const ignoredResourceTokens = new Set([
+  ...ignoredSourcePathTokens,
+  "v1",
+  "v2",
+  "v3",
+  "http",
+  "https"
 ]);
 
 function tokenVariants(token: string): string[] {
@@ -120,6 +136,106 @@ function extractAction(tokens: string[]): string | undefined {
     if (action) return action;
   }
   return undefined;
+}
+
+function operationSegments(path: string): string[] {
+  return path
+    .split("/")
+    .filter(Boolean)
+    .filter((segment) => !(segment.startsWith("{") && segment.endsWith("}")));
+}
+
+function inferOperationAction(operation: OperationSurface): string | undefined {
+  const opIdAction = extractAction(toTokens(operation.operationId));
+  if (opIdAction) return opIdAction;
+
+  const segments = operationSegments(operation.path);
+  const tail = segments.length ? segments[segments.length - 1] ?? "" : "";
+  const tailAction = extractAction(toTokens(tail));
+  if (tailAction) return tailAction;
+
+  const hasTrailingParam = /\/\{[^}]+\}\s*$/.test(operation.path);
+  if (operation.method === "get") return hasTrailingParam ? "retrieve" : "list";
+  if (operation.method === "post") return hasTrailingParam ? "update" : "create";
+  if (operation.method === "put" || operation.method === "patch") return "update";
+  return "delete";
+}
+
+function operationResourceTokens(operation: OperationSurface): string[] {
+  const segments = operationSegments(operation.path);
+  if (!segments.length) return [];
+  const tailAction = extractAction(toTokens(segments[segments.length - 1] ?? ""));
+  const resourceSegments = tailAction && segments.length > 1 ? segments.slice(0, -1) : segments;
+  return expandTokens(
+    resourceSegments
+      .flatMap((segment) => toTokens(segment))
+      .filter((token) => !ignoredResourceTokens.has(token))
+  );
+}
+
+function methodResourceTokens(method: SdkMethodSurface): string[] {
+  const sourceTokens = sourceFileTokens(method.sourceFile);
+  const namespaceTokens = toTokens(method.namespace);
+  const methodTokens = toTokens(method.methodName);
+  const actionTokens = new Set(Object.values(actionGroups).flat());
+
+  return expandTokens(
+    [...sourceTokens, ...namespaceTokens, ...methodTokens].filter(
+      (token) => !ignoredResourceTokens.has(token) && !actionTokens.has(token)
+    )
+  );
+}
+
+function fallbackScore(operation: OperationSurface, method: SdkMethodSurface): number {
+  const opResources = [...new Set(operationResourceTokens(operation).map(singularizeToken))];
+  const methodResources = [...new Set(methodResourceTokens(method).map(singularizeToken))];
+  const resourceOverlapScore = overlapScore(opResources, methodResources);
+  const methodResourceSet = new Set(methodResources);
+  const resourceContainmentScore = opResources.length
+    ? opResources.filter((token) => methodResourceSet.has(token)).length / opResources.length
+    : 0;
+  const resourceScore = Math.max(resourceOverlapScore, resourceContainmentScore);
+  if (resourceScore === 0) return 0;
+
+  const opAction = inferOperationAction(operation);
+  const methodAction = extractAction([...toTokens(method.namespace), ...toTokens(method.methodName)]);
+  const actionScore = opAction && methodAction && opAction === methodAction ? 1 : 0;
+  if (opAction && methodAction && opAction !== methodAction) return 0;
+
+  const specPathParams = operation.pathParams.map((param) => normalizeParamName(param.name));
+  const sdkParams = method.params.map((param) => normalizeParamName(param.name));
+  const hasBagParam = sdkParams.some(
+    (name) => name.includes("request") || name.includes("params") || name.includes("options") || name.includes("input")
+  );
+  const pathParamScore = specPathParams.length ? overlapScore(specPathParams, sdkParams) : hasBagParam ? 0.6 : 0.5;
+
+  return resourceScore * 0.65 + actionScore * 0.25 + pathParamScore * 0.1;
+}
+
+function classifyUnmatchedReason(
+  operation: OperationSurface,
+  methods: SdkMethodSurface[],
+  usedMethodIds: Set<string>
+): UnmatchedReason {
+  const availableMethods = methods.filter((method) => !usedMethodIds.has(method.id));
+  const opResources = [...new Set(operationResourceTokens(operation).map(singularizeToken))];
+  const resourceCandidates = availableMethods.filter((method) => {
+    const methodResources = [...new Set(methodResourceTokens(method).map(singularizeToken))];
+    return overlapScore(opResources, methodResources) > 0;
+  });
+
+  if (resourceCandidates.length === 0) return "no_matching_resource_in_sdk";
+
+  const opAction = inferOperationAction(operation);
+  if (!opAction) return "low_confidence_unmatched";
+
+  const actionCandidates = resourceCandidates.filter((method) => {
+    const methodAction = extractAction([...toTokens(method.namespace), ...toTokens(method.methodName)]);
+    return methodAction === opAction;
+  });
+
+  if (actionCandidates.length === 0) return "no_matching_action_in_resource";
+  return "path_based_match_available";
 }
 
 function overlapScore(a: string[], b: string[]): number {
@@ -246,10 +362,32 @@ export function matchOperations(
       };
     }
 
+    let fallbackBest: SdkMethodSurface | undefined;
+    let fallbackBestScore = 0;
+    for (const method of methods) {
+      if (usedMethodIds.has(method.id)) continue;
+      const score = fallbackScore(operation, method);
+      if (score > fallbackBestScore) {
+        fallbackBestScore = score;
+        fallbackBest = method;
+      }
+    }
+
+    if (fallbackBest && fallbackBestScore >= 0.72) {
+      usedMethodIds.add(fallbackBest.id);
+      return {
+        operationId: operation.operationId,
+        sdkMethodId: fallbackBest.id,
+        confidence: Number(fallbackBestScore.toFixed(3)),
+        strategy: "path_fallback"
+      };
+    }
+
     return {
       operationId: operation.operationId,
       confidence: 0,
-      strategy: "unmatched"
+      strategy: "unmatched",
+      unmatchedReason: classifyUnmatchedReason(operation, methods, usedMethodIds)
     };
   });
 }

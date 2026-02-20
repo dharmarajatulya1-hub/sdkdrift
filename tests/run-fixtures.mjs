@@ -167,6 +167,14 @@ runCase({
 });
 
 runCase({
+  name: "path-fallback",
+  spec: "./fixtures/cases/path-fallback/openapi.yaml",
+  sdk: "./fixtures/cases/path-fallback/sdk/python",
+  lang: "python",
+  expectedScore: 100
+});
+
+runCase({
   name: "unsupported-resource",
   spec: "./fixtures/cases/unsupported-resource/openapi.yaml",
   sdk: "./fixtures/cases/unsupported-resource/sdk/python",

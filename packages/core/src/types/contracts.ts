@@ -66,16 +66,28 @@ export interface DriftReport {
     operationsTotal: number;
     operationsMatched: number;
     findingsTotal: number;
+    actionableFindingsTotal?: number;
+    coverageNotesTotal?: number;
+    unmatchedReasons?: Partial<Record<UnmatchedReason, number>>;
   };
   deductions: Partial<Record<DriftCategory, number>>;
   findings: DriftFinding[];
+  actionableFindings?: DriftFinding[];
+  coverageNotes?: DriftFinding[];
 }
+
+export type UnmatchedReason =
+  | "no_matching_resource_in_sdk"
+  | "no_matching_action_in_resource"
+  | "path_based_match_available"
+  | "low_confidence_unmatched";
 
 export interface MatchResult {
   operationId: string;
   sdkMethodId?: string;
   confidence: number;
-  strategy: "exact" | "heuristic" | "override" | "unmatched";
+  strategy: "exact" | "heuristic" | "override" | "path_fallback" | "unmatched";
+  unmatchedReason?: UnmatchedReason;
 }
 
 export interface MatchOptions {
