@@ -2,7 +2,7 @@
 
 Last updated: 2026-02-20
 Branch: `main`
-Latest commit: `f3b450e` (validation hardening in working tree, not committed yet)
+Latest commit: `bdb1a13` (additional matcher/scanner/scoring hardening in working tree)
 
 ## Current Focus
 Launch readiness pass.
@@ -22,6 +22,9 @@ Launch readiness pass.
 - [x] Execute external-repo validation and capture findings in `validation/real-world/`
 - [x] Apply targeted false-positive reductions (matcher + diff + scanner filters)
 - [x] Add regression fixtures for param casing + Python `Annotated[...]` handling
+- [x] Add regression fixtures for verb aliases (`modify`) and action disambiguation (`cancel`)
+- [x] Add scanner ID hygiene (path-qualified method IDs) + wrapper exclusion
+- [x] Add scoring normalization to avoid large-spec score saturation
 - [ ] Complete Stripe Node real-world parsing support (`StripeResource.extend(...)` pattern)
 
 ## Validation Snapshot (baseline -> post2)
@@ -29,6 +32,18 @@ Launch readiness pass.
 - `ory-kratos-ts`: findings `98 -> 1` (99.0% reduction), score `0 -> 99`
 - `stripe-python`: findings `1900 -> 1595` (16.1% reduction), matched `131/534 -> 153/534`
 - `stripe-node-ts`: findings `625 -> 603` (3.5% reduction), matched `0/534 -> 0/534` (still blocked by scanner pattern gap)
+
+## OpenAI Snapshot (baseline -> latest local run)
+- `openai-python` against `openapi.documented.yml`:
+  - matched `93/237 -> 150/237`
+  - findings `646 -> 287` (55.6% reduction)
+  - category deltas:
+    - `missing_endpoint`: `144 -> 87`
+    - `extra_sdk_method`: `446 -> 164`
+    - `type_mismatch`: `31 -> 6`
+    - `required_field_added`: `17 -> 16`
+    - `changed_param`: `8 -> 14` (small increase from tighter method routing)
+  - score changed from `0 -> 58` after normalization
 
 ## Verification Checks Run
 - `npm run build`
@@ -38,6 +53,7 @@ Launch readiness pass.
 
 ## Next
 - Add TS scanner support for generated SDK object-literal resources (Stripe Node pattern).
+- Add targeted OpenAI matcher improvements for org/admin hyphenated operation IDs (`list-project-*`, `admin-*`) to reduce remaining `missing_endpoint`.
 - Re-run `stripe-node-ts` real-world validation and confirm operation matches increase from `0`.
 - Classify remaining Ory/Stripe findings into true drift vs residual scanner limitations.
 - Promote stable validation commands into CI (non-blocking matrix first, then required checks).

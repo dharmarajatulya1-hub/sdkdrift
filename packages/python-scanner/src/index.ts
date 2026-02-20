@@ -1,6 +1,6 @@
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { basename, dirname, join } from "node:path";
+import { basename, dirname, join, relative, resolve } from "node:path";
 import type { SdkMethodSurface } from "@sdkdrift/core";
 import { Project, Scope } from "ts-morph";
 
@@ -44,14 +44,32 @@ export async function scanTypeScriptSdk(_sdkPath: string): Promise<SdkMethodSurf
   const project = new Project({
     skipAddingFilesFromTsConfig: true
   });
-  const normalized = _sdkPath.replace(/\\/g, "/");
-  project.addSourceFilesAtPaths(`${normalized}/**/*.ts`);
+  const rootPath = resolve(_sdkPath).replace(/\\/g, "/");
+  project.addSourceFilesAtPaths(`${rootPath}/**/*.ts`);
 
   const output: SdkMethodSurface[] = [];
   const verbPrefixes = ["get", "list", "create", "update", "delete", "post", "put", "patch", "retrieve", "remove"];
+  const wrapperMethods = new Set(["withRawResponse", "withStreamingResponse", "with_raw_response", "with_streaming_response"]);
+
+  function moduleNameFromPath(filePath: string): string {
+    const rel = relative(rootPath, filePath).replace(/\\/g, "/").replace(/\.tsx?$/i, "");
+    const parts = rel.split("/").filter((part) => part && part !== "__init__");
+    return parts.join(".") || "root";
+  }
+
+  function isWrapperClass(className: string | undefined): boolean {
+    if (!className) return false;
+    return (
+      className.endsWith("WithRawResponse") ||
+      className.endsWith("WithStreamingResponse") ||
+      className.endsWith("RawResponse") ||
+      className.endsWith("StreamingResponse")
+    );
+  }
 
   function shouldIncludeClass(filePath: string, className: string | undefined, exported: boolean): boolean {
     if (!className) return false;
+    if (isWrapperClass(className)) return false;
     if (className.endsWith("Api")) return true;
     if (filePath.includes("/api/")) return true;
     if (filePath.includes("/src/resources/")) return true;
@@ -69,14 +87,16 @@ export async function scanTypeScriptSdk(_sdkPath: string): Promise<SdkMethodSurf
     if (/(^|\/)(test|tests|__tests__)\//.test(filePath)) continue;
 
     for (const classDecl of sourceFile.getClasses()) {
+      const moduleName = moduleNameFromPath(filePath);
       const namespace = classDecl.getName() ?? basename(filePath, ".ts");
       if (!shouldIncludeClass(filePath, classDecl.getName(), classDecl.isExported())) continue;
       for (const method of classDecl.getMethods()) {
-        if (method.getScope() === Scope.Private || method.getName().startsWith("_")) continue;
+        const methodName = method.getName();
+        if (method.getScope() === Scope.Private || methodName.startsWith("_") || wrapperMethods.has(methodName)) continue;
         output.push({
-          id: `${namespace}.${method.getName()}`,
+          id: `${moduleName}:${namespace}.${methodName}`,
           namespace,
-          methodName: method.getName(),
+          methodName,
           params: method.getParameters().map((param) => ({
             name: param.getName(),
             in: "query",
@@ -92,12 +112,14 @@ export async function scanTypeScriptSdk(_sdkPath: string): Promise<SdkMethodSurf
 
     for (const fn of sourceFile.getFunctions()) {
       if (!fn.isExported()) continue;
+      const moduleName = moduleNameFromPath(filePath);
       const namespace = basename(filePath, ".ts");
       const methodName = fn.getName();
       if (!methodName || methodName.startsWith("_")) continue;
+      if (wrapperMethods.has(methodName)) continue;
       if (!shouldIncludeFunction(filePath, methodName)) continue;
       output.push({
-        id: `${namespace}.${methodName}`,
+        id: `${moduleName}:${methodName}`,
         namespace,
         methodName,
         params: fn.getParameters().map((param) => ({

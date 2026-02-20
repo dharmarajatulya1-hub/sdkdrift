@@ -9,16 +9,45 @@ function findParam(method: SdkMethodSurface, name: string) {
   return method.params.find((param) => normalizeParamName(param.name) === target);
 }
 
+function inferLiteralType(raw: string): string | undefined {
+  const content = raw.replace(/\s+/g, "");
+  const cleaned = content.replace(/["'`]/g, "");
+  if (!cleaned) return undefined;
+
+  if (/^(true|false)([|,](true|false))*$/i.test(cleaned)) return "boolean";
+  if (/^-?\d+(\.\d+)?([|,]-?\d+(\.\d+)?)*$/.test(cleaned)) return "number";
+  if (/^[a-z0-9_\-]+([|,][a-z0-9_\-]+)*$/i.test(cleaned)) return "string";
+
+  return "string";
+}
+
 function normalizeType(value?: string): string {
   if (!value) return "unknown";
   let v = value.toLowerCase().trim();
 
   v = v.replace(/\s+/g, "");
-  v = v.replace(/^annotated\[(.+)\]$/, "$1");
-  v = v.replace(/^optional\[(.+)\]$/, "$1");
-  v = v.replace(/^union\[(.+)\]$/, "$1");
-  v = v.replace(/^literal\[(.+)\]$/, "$1");
-  v = v.replace(/\|undefined|\|null/g, "");
+  v = v.replace(/\|undefined|\|null|\|none/g, "");
+  v = v.replace(/\|omit|\|notgiven|\|not_given/g, "");
+  v = v.replace(/undefined\||null\||none\|/g, "");
+  v = v.replace(/omit\||notgiven\||not_given\|/g, "");
+
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const pattern of [/^annotated\[(.+)\]$/, /^optional\[(.+)\]$/, /^union\[(.+)\]$/]) {
+      const match = v.match(pattern);
+      if (match) {
+        v = match[1] ?? v;
+        changed = true;
+      }
+    }
+  }
+
+  const literalMatch = v.match(/literal\[(.+?)\]/);
+  if (literalMatch?.[1]) {
+    return inferLiteralType(literalMatch[1]) ?? "string";
+  }
+
   v = v.replace(/^promise<(.+)>$/, "$1");
   v = v.replace(/^readonlyarray<(.+)>$/, "$1[]");
   v = v.replace(/^array<(.+)>$/, "$1[]");
@@ -58,6 +87,7 @@ function normalizeType(value?: string): string {
   if (alnum.startsWith("dict") || alnum.startsWith("map") || alnum.startsWith("record") || alnum.startsWith("object")) {
     return "object";
   }
+  if (alnum.startsWith("literal") || alnum.includes("enum")) return "string";
   return aliases[alnum] ?? alnum;
 }
 

@@ -25,16 +25,36 @@ def annotation_to_text(node: Any) -> str:
     return "unknown"
 
 
-def scan_file(path: str) -> List[Dict[str, Any]]:
+def module_name_from_path(path: str, root: str) -> str:
+    relative_path = os.path.relpath(path, root).replace("\\", "/")
+    if relative_path.endswith(".py"):
+        relative_path = relative_path[:-3]
+    parts = [part for part in relative_path.split("/") if part and part != "__init__"]
+    return ".".join(parts) if parts else "root"
+
+
+def is_wrapper_class(namespace: str) -> bool:
+    return (
+        namespace.endswith("WithRawResponse")
+        or namespace.endswith("WithStreamingResponse")
+        or namespace.endswith("RawResponse")
+        or namespace.endswith("StreamingResponse")
+    )
+
+
+def scan_file(path: str, root: str) -> List[Dict[str, Any]]:
     with open(path, "r", encoding="utf-8") as f:
         source = f.read()
     tree = ast.parse(source, filename=path)
+    module_name = module_name_from_path(path, root)
 
     methods: List[Dict[str, Any]] = []
 
     for node in tree.body:
         if isinstance(node, ast.ClassDef):
             namespace = node.name
+            if is_wrapper_class(namespace):
+                continue
             lowered_path = path.lower()
             base_names: List[str] = []
             for base in node.bases:
@@ -57,6 +77,8 @@ def scan_file(path: str) -> List[Dict[str, Any]]:
             for item in node.body:
                 if isinstance(item, ast.FunctionDef):
                     if item.name.startswith("_"):
+                        continue
+                    if item.name in ("with_raw_response", "with_streaming_response"):
                         continue
                     params = []
                     positional_args = [arg for arg in item.args.args if arg.arg != "self"]
@@ -85,7 +107,7 @@ def scan_file(path: str) -> List[Dict[str, Any]]:
                             }
                         })
                     methods.append({
-                        "id": f"{namespace}.{item.name}",
+                        "id": f"{module_name}:{namespace}.{item.name}",
                         "namespace": namespace,
                         "methodName": item.name,
                         "params": params,
@@ -112,7 +134,7 @@ def main() -> int:
                 continue
             path = os.path.join(dirpath, name)
             try:
-                all_methods.extend(scan_file(path))
+                all_methods.extend(scan_file(path, root))
             except Exception as exc:
                 print(f"Warning: failed to parse {path}: {exc}", file=sys.stderr)
 

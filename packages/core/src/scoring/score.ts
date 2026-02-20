@@ -21,7 +21,10 @@ export function scoreReport(
   }
 
   const totalDeduction = Object.values(deductions).reduce((acc, v) => acc + (v ?? 0), 0);
-  const score = Math.max(0, 100 - totalDeduction);
+  // Normalize deduction by spec size so large real-world APIs do not saturate to 0 immediately.
+  const normalizationFactor = Math.max(1, operationsTotal / 10);
+  const normalizedDeduction = totalDeduction / normalizationFactor;
+  const score = Math.max(0, Math.round(100 - normalizedDeduction));
 
   return {
     score,

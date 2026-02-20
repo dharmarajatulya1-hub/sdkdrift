@@ -143,6 +143,22 @@ runCase({
 });
 
 runCase({
+  name: "verb-alias-modify",
+  spec: "./fixtures/cases/verb-alias-modify/openapi.yaml",
+  sdk: "./fixtures/cases/verb-alias-modify/sdk/python",
+  lang: "python",
+  expectedScore: 100
+});
+
+runCase({
+  name: "action-cancel",
+  spec: "./fixtures/cases/action-cancel/openapi.yaml",
+  sdk: "./fixtures/cases/action-cancel/sdk/python",
+  lang: "python",
+  expectedScore: 99
+});
+
+runCase({
   name: "threshold-exit",
   spec: "./fixtures/cases/missing-endpoint/openapi.yaml",
   sdk: "./fixtures/cases/missing-endpoint/sdk/python",

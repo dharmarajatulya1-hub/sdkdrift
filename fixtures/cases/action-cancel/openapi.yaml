@@ -1,0 +1,17 @@
+openapi: 3.0.3
+info:
+  title: Action Cancel Case
+  version: 1.0.0
+paths:
+  /batches/{batch_id}/cancel:
+    post:
+      operationId: cancelBatch
+      parameters:
+        - name: batch_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ok
