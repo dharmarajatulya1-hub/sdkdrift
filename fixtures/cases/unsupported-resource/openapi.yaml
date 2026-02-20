@@ -1,0 +1,11 @@
+openapi: 3.0.3
+info:
+  title: Unsupported Resource Case
+  version: 1.0.0
+paths:
+  /voice-consents:
+    get:
+      operationId: listVoiceConsents
+      responses:
+        "200":
+          description: ok

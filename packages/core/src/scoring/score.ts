@@ -2,6 +2,7 @@ import type { DriftCategory, DriftFinding, DriftReport } from "../types/contract
 
 const weights: Record<DriftCategory, number> = {
   missing_endpoint: 8,
+  unsupported_resource: 4,
   required_field_added: 5,
   type_mismatch: 3,
   changed_param: 3,
@@ -14,10 +15,20 @@ export function scoreReport(
   operationsTotal: number,
   operationsMatched: number
 ): Pick<DriftReport, "score" | "deductions" | "summary"> {
+  const counts: Partial<Record<DriftCategory, number>> = {};
   const deductions: Partial<Record<DriftCategory, number>> = {};
 
   for (const finding of findings) {
-    deductions[finding.category] = (deductions[finding.category] ?? 0) + weights[finding.category];
+    counts[finding.category] = (counts[finding.category] ?? 0) + 1;
+  }
+
+  const unmatchedOps = Math.max(0, operationsTotal - operationsMatched);
+  for (const [category, count] of Object.entries(counts) as Array<[DriftCategory, number]>) {
+    const cappedCount =
+      category === "missing_endpoint" || category === "unsupported_resource"
+        ? Math.min(count, unmatchedOps)
+        : count;
+    deductions[category] = cappedCount * weights[category];
   }
 
   const totalDeduction = Object.values(deductions).reduce((acc, v) => acc + (v ?? 0), 0);

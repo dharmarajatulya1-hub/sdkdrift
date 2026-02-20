@@ -52,6 +52,9 @@ function normalizeType(value?: string): string {
   v = v.replace(/^readonlyarray<(.+)>$/, "$1[]");
   v = v.replace(/^array<(.+)>$/, "$1[]");
   v = v.replace(/^list<(.+)>$/, "$1[]");
+  v = v.replace(/^list\[(.+)\]$/, "$1[]");
+  v = v.replace(/^sequence\[(.+)\]$/, "$1[]");
+  v = v.replace(/^tuple\[(.+)\]$/, "$1[]");
 
   const alnum = v.replace(/[^a-z0-9\[\]]/g, "");
 
@@ -106,8 +109,71 @@ function usesParameterBag(method: SdkMethodSurface): boolean {
 
 function severityFor(category: DriftCategory): DriftFinding["severity"] {
   if (category === "missing_endpoint" || category === "required_field_added") return "high";
+  if (category === "unsupported_resource") return "medium";
   if (category === "type_mismatch" || category === "changed_param") return "medium";
   return "low";
+}
+
+function tokenize(value: string): string[] {
+  return value
+    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .split(" ")
+    .filter(Boolean);
+}
+
+function singularize(token: string): string {
+  if (token.endsWith("ies") && token.length > 3) return `${token.slice(0, -3)}y`;
+  if (token.endsWith("es") && token.length > 4) return token.slice(0, -2);
+  if (token.endsWith("s") && token.length > 3) return token.slice(0, -1);
+  return token;
+}
+
+function operationResourceToken(path: string): string | undefined {
+  const ignored = new Set(["v1", "v2", "v3", "api", "openapi"]);
+  const parts = path
+    .split("/")
+    .filter(Boolean)
+    .filter((part) => !(part.startsWith("{") && part.endsWith("}")));
+  for (const part of parts) {
+    const tokens = tokenize(part);
+    for (const token of tokens) {
+      if (!ignored.has(token)) return token;
+    }
+  }
+  return undefined;
+}
+
+function buildSdkVocabulary(methods: SdkMethodSurface[]): Set<string> {
+  const vocab = new Set<string>();
+  for (const method of methods) {
+    for (const token of tokenize(`${method.namespace} ${method.methodName}`)) {
+      vocab.add(token);
+      vocab.add(singularize(token));
+    }
+    if (method.sourceFile) {
+      for (const token of tokenize(method.sourceFile.replace(/\\/g, "/"))) {
+        vocab.add(token);
+        vocab.add(singularize(token));
+      }
+    }
+  }
+  return vocab;
+}
+
+function remediationFor(category: DriftCategory, highConfidence: boolean): string | undefined {
+  if (!highConfidence) {
+    if (category === "unsupported_resource") {
+      return "Verify SDK/version coverage for this API resource before treating as drift.";
+    }
+    return "Review spec and SDK version alignment; this finding may be affected by heuristic matching.";
+  }
+  if (category === "missing_endpoint") return "Add or regenerate corresponding SDK method";
+  if (category === "required_field_added") return "Regenerate SDK or add missing required parameter";
+  if (category === "type_mismatch") return "Update SDK parameter type to match OpenAPI schema";
+  return undefined;
 }
 
 export function computeDiff(
@@ -116,16 +182,27 @@ export function computeDiff(
   matches: MatchResult[]
 ): DriftFinding[] {
   const findings: DriftFinding[] = [];
+  const sdkVocabulary = buildSdkVocabulary(methods);
 
   for (const match of matches) {
+    const isHighConfidence = match.strategy === "exact" || match.strategy === "override" || match.confidence >= 0.75;
     if (!match.sdkMethodId) {
+      const operation = operations.find((op) => op.operationId === match.operationId);
+      const resource = operation ? operationResourceToken(operation.path) : undefined;
+      const resourceSupported = resource
+        ? sdkVocabulary.has(resource.toLowerCase()) || sdkVocabulary.has(singularize(resource.toLowerCase()))
+        : true;
+      const category: DriftCategory = resourceSupported ? "missing_endpoint" : "unsupported_resource";
       findings.push({
         id: `missing_${match.operationId}`,
-        category: "missing_endpoint",
-        severity: "high",
+        category,
+        severity: severityFor(category),
         operationId: match.operationId,
-        message: `Operation ${match.operationId} is not represented in SDK`,
-        remediation: "Add or regenerate corresponding SDK method"
+        message:
+          category === "unsupported_resource"
+            ? `Operation ${match.operationId} appears to target an unsupported SDK resource`
+            : `Operation ${match.operationId} is not represented in SDK`,
+        remediation: remediationFor(category, isHighConfidence)
       });
       continue;
     }
@@ -146,7 +223,7 @@ export function computeDiff(
           operationId: operation.operationId,
           sdkMethodId: method.id,
           message: `Required parameter ${specParam.name} is missing in SDK method ${method.methodName}`,
-          remediation: "Regenerate SDK or add missing required parameter"
+          remediation: remediationFor("required_field_added", isHighConfidence)
         });
         continue;
       }
@@ -173,7 +250,7 @@ export function computeDiff(
           operationId: operation.operationId,
           sdkMethodId: method.id,
           message: `Type mismatch for ${specParam.name}: spec=${specType}, sdk=${sdkType}`,
-          remediation: "Update SDK parameter type to match OpenAPI schema"
+          remediation: remediationFor("type_mismatch", isHighConfidence)
         });
       }
     }

@@ -42,6 +42,7 @@ export interface SdkMethodSurface {
 
 export type DriftCategory =
   | "missing_endpoint"
+  | "unsupported_resource"
   | "changed_param"
   | "required_field_added"
   | "type_mismatch"

@@ -1,0 +1,19 @@
+openapi: 3.0.3
+info:
+  title: Array List Equivalence
+  version: 1.0.0
+paths:
+  /items:
+    get:
+      operationId: listItems
+      parameters:
+        - name: include
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        "200":
+          description: ok

@@ -143,6 +143,14 @@ runCase({
 });
 
 runCase({
+  name: "array-list",
+  spec: "./fixtures/cases/array-list/openapi.yaml",
+  sdk: "./fixtures/cases/array-list/sdk/python",
+  lang: "python",
+  expectedScore: 100
+});
+
+runCase({
   name: "verb-alias-modify",
   spec: "./fixtures/cases/verb-alias-modify/openapi.yaml",
   sdk: "./fixtures/cases/verb-alias-modify/sdk/python",
@@ -156,6 +164,14 @@ runCase({
   sdk: "./fixtures/cases/action-cancel/sdk/python",
   lang: "python",
   expectedScore: 99
+});
+
+runCase({
+  name: "unsupported-resource",
+  spec: "./fixtures/cases/unsupported-resource/openapi.yaml",
+  sdk: "./fixtures/cases/unsupported-resource/sdk/python",
+  lang: "python",
+  expectedCategories: ["unsupported_resource"]
 });
 
 runCase({
