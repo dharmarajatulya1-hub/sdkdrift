@@ -7,6 +7,8 @@ SDKDrift detects drift between an OpenAPI spec and SDK surface, reports what cha
 ## What It Solves
 When your API spec evolves faster than generated SDKs, users hit missing methods, wrong params, and type mismatches. SDKDrift catches that before release.
 
+If your SDK and spec are already perfectly in sync, this tool will be pleasantly boring. That is the goal.
+
 ## Packages
 - `@sdkdrift/cli`: command-line interface
 - `@sdkdrift/core`: parser, matcher, diff, scoring engine
@@ -131,12 +133,7 @@ jobs:
 - `VALIDATION_REPORT.md`: latest validation summary
 - `RELEASE.md`: release and publish guide
 - `RELEASE_NOTES_v0.2.0.md`: release notes
-
-## Landing Environment Variables
-- `SUPABASE_URL` (required): Supabase project URL
-- `SUPABASE_SERVICE_ROLE_KEY` (required): service role key used by API route
-- `SUPABASE_WAITLIST_TABLE` (optional): table name (default `waitlist_signups`)
-- `NEXT_PUBLIC_SITE_URL` (optional): canonical site URL for metadata
+- `packages/landing/README.md`: landing-specific env/setup docs
 
 ## Troubleshooting
 - Config errors: validate `sdkdrift.config.yaml` against `CONFIG_SPEC.md`

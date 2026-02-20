@@ -56,7 +56,7 @@ export default function LandingPage() {
           <input
             type="email"
             required
-            placeholder="Work email"
+            placeholder="Email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             aria-label="Email"
