@@ -2,38 +2,58 @@
 
 Never ship a stale SDK again.
 
-SDKDrift detects drift between an OpenAPI spec and generated SDK code, reports the mismatch, and returns a CI-friendly score.
+SDKDrift detects drift between an OpenAPI spec and SDK surface, reports what changed, and outputs a score you can gate in CI.
 
-## Current MVP
-- OpenAPI parsing (core)
-- Python SDK surface scan (AST bridge)
-- CLI scan command with terminal/JSON/Markdown output
-- Drift score and threshold exit codes
+## What It Solves
+When your API spec evolves faster than generated SDKs, users hit missing methods, wrong params, and type mismatches. SDKDrift catches that before release.
 
-## Quick Start
-```bash
-npm install
-npm run build
-npm run smoke:cli
-```
+## Packages
+- `@sdkdrift/cli`: command-line interface
+- `@sdkdrift/core`: parser, matcher, diff, scoring engine
+- `@sdkdrift/python-scanner`: language scanner package (Python + TypeScript scanner entrypoints)
 
-## Install From npm
+## Install
+### One-off use
 ```bash
 npx @sdkdrift/cli scan --help
 ```
 
-## CLI Example
+### Project dependency
+```bash
+npm install --save-dev @sdkdrift/cli
+```
+
+## Quick Start
 ```bash
 npx @sdkdrift/cli scan \
-  --spec ./fixtures/simple/openapi.yaml \
-  --sdk ./fixtures/simple/sdk/python \
+  --spec ./openapi.yaml \
+  --sdk ./sdk/python \
   --lang python \
   --format terminal
 ```
 
-## Config Example
+## CLI Command
+```bash
+sdkdrift scan --spec <pathOrUrl> --sdk <path> --lang <python|ts> [options]
+```
+
+### Options
+- `--spec <pathOrUrl>`: OpenAPI file path or URL
+- `--sdk <path>`: SDK root directory
+- `--lang <python|ts>`: language scanner
+- `--format <terminal|json|markdown>`: output format (default `terminal`)
+- `--config <path>`: config file path (`sdkdrift.config.yaml`)
+- `--out <path>`: write report to file
+- `--min-score <0..100>`: fail process when score is lower than threshold
+- `--verbose`: emit matcher diagnostics to stderr
+
+### Exit Codes
+- `0`: success and score >= threshold
+- `1`: runtime/config/parse error
+- `2`: score below `--min-score`
+
+## Config (`sdkdrift.config.yaml`)
 ```yaml
-# sdkdrift.config.yaml
 match:
   heuristicThreshold: 0.55
 mapping:
@@ -42,47 +62,46 @@ mapping:
       sdkMethod: UsersApi.fetch_users
 ```
 
-```bash
-npx @sdkdrift/cli scan \
-  --spec ./fixtures/cases/override/openapi.yaml \
-  --sdk ./fixtures/cases/override/sdk/python \
-  --lang python \
-  --config ./fixtures/cases/override/sdkdrift.config.yaml \
-  --format json
+Validation rules are documented in `CONFIG_SPEC.md`.
+
+## Output Examples
+### Terminal
+```text
+SDKDrift Report
+Score: 92/100
+Operations: 1/2 matched
+Findings: 1
+- [high] missing_endpoint: Operation getUser is not represented in SDK
 ```
 
-## Verbose Diagnostics
-```bash
-npx @sdkdrift/cli scan \
-  --verbose \
-  --spec ./fixtures/simple/openapi.yaml \
-  --sdk ./fixtures/simple/sdk/python \
-  --lang python \
-  --format json
+### JSON
+```json
+{
+  "version": "1",
+  "score": 92,
+  "summary": {
+    "operationsTotal": 2,
+    "operationsMatched": 1,
+    "findingsTotal": 1
+  },
+  "deductions": {
+    "missing_endpoint": 8
+  },
+  "findings": [
+    {
+      "id": "missing_getUser",
+      "category": "missing_endpoint",
+      "severity": "high",
+      "operationId": "getUser",
+      "message": "Operation getUser is not represented in SDK"
+    }
+  ]
+}
 ```
 
-Verbose diagnostics are written to stderr and include strategy counts and unmatched operation IDs.
+Contract stability is documented in `SCHEMA.md`.
 
-## Repository Layout
-- `packages/core` shared parsing, matching, diffing, scoring, reporting
-- `packages/cli` CLI command wrapper
-- `packages/python-scanner` Python AST scanner bridge
-- `packages/landing` landing-page app scaffold
-- `fixtures` local scan fixtures
-- `tests` smoke and integration test assets
-
-## Project Status
-- Current execution tracker: `STATUS.md`
-- JSON contract: `SCHEMA.md`
-- Config contract: `CONFIG_SPEC.md`
-- Validation snapshot: `VALIDATION_REPORT.md`
-- Release process: `RELEASE.md`
-
-## Package Release
-- Dry-run/package workflows are in `.github/workflows/release-dry-run.yml` and `.github/workflows/publish.yml`.
-- Set `NPM_TOKEN` in GitHub repository secrets before real publish.
-
-## CI Example
+## CI Usage
 ```yaml
 name: SDK Drift Check
 on: [push]
@@ -97,18 +116,28 @@ jobs:
       - run: npx @sdkdrift/cli scan --spec ./openapi.yaml --sdk ./sdk/python --lang python --min-score 90
 ```
 
-## Near-Term Roadmap
-1. Implement TypeScript SDK scanning with `ts-morph`
-2. Improve matcher heuristics and override mappings
-3. Add fixture matrix and automated tests
-4. Build landing page MVP (waitlist-first)
+## Repository Layout
+- `packages/core`: parsing, matching, diffing, scoring
+- `packages/cli`: command orchestration and output
+- `packages/python-scanner`: scanner runtime
+- `packages/landing`: marketing/waitlist site
+- `fixtures`: fixture matrix for behavior validation
+- `tests`: smoke and fixture test runner
 
-## Landing Env Vars
-- `WAITLIST_WEBHOOK_URL` required for waitlist submissions.
-- `WAITLIST_PROVIDER` optional (`formspree` or `generic`).
-- `NEXT_PUBLIC_SITE_URL` optional canonical URL for metadata.
+## Docs Index
+- `STATUS.md`: project execution status
+- `SCHEMA.md`: JSON report contract
+- `CONFIG_SPEC.md`: config contract
+- `VALIDATION_REPORT.md`: latest validation summary
+- `RELEASE.md`: release and publish guide
+- `RELEASE_NOTES_v0.2.0.md`: release notes
+
+## Landing Environment Variables
+- `WAITLIST_WEBHOOK_URL` (required): waitlist sink endpoint
+- `WAITLIST_PROVIDER` (optional): `formspree` or `generic`
+- `NEXT_PUBLIC_SITE_URL` (optional): canonical site URL for metadata
 
 ## Troubleshooting
-- `Invalid config`: validate against `CONFIG_SPEC.md`.
-- `Unknown option` errors: ensure CLI was rebuilt (`npm run build`) after updates.
-- Missing waitlist submissions: verify `WAITLIST_WEBHOOK_URL` is set in Vercel.
+- Config errors: validate `sdkdrift.config.yaml` against `CONFIG_SPEC.md`
+- No CLI updates after changes: rebuild or reinstall package
+- Waitlist failures: confirm `WAITLIST_WEBHOOK_URL` is set in Vercel project env vars

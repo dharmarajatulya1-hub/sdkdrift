@@ -7,17 +7,17 @@ export const metadata: Metadata = {
     default: "SDKDrift",
     template: "%s | SDKDrift"
   },
-  description: "Detect OpenAPI-to-SDK drift before users do.",
+  description: "Detect SDK drift between OpenAPI and generated clients before production.",
   openGraph: {
     title: "SDKDrift",
-    description: "Never ship a stale SDK again.",
+    description: "Detect SDK drift before users do.",
     type: "website",
     url: "/"
   },
   twitter: {
     card: "summary_large_image",
     title: "SDKDrift",
-    description: "Detect OpenAPI-to-SDK drift before users do."
+    description: "Detect SDK drift between OpenAPI and generated clients."
   }
 };
 

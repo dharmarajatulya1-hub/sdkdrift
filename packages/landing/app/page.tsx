@@ -33,12 +33,15 @@ export default function LandingPage() {
 
   return (
     <main className="page">
-      <section className="hero">
-        <p className="eyebrow">Open source drift detection</p>
-        <h1>Never ship a stale SDK again.</h1>
+      <div className="orb orbA" />
+      <div className="orb orbB" />
+
+      <section className="hero panel">
+        <p className="eyebrow">Open source SDK drift detection</p>
+        <h1>Detect SDK drift before your users do.</h1>
         <p className="sub">
-          SDKDrift scans your OpenAPI spec and SDK surface, highlights mismatches, and gives you a CI-friendly drift
-          score.
+          SDKDrift compares your OpenAPI contract with real SDK surface area, highlights missing or mismatched methods,
+          and returns a CI-ready drift score.
         </p>
 
         <form className="waitlist" onSubmit={onSubmit}>
@@ -60,6 +63,7 @@ export default function LandingPage() {
 
         <div className="ctas">
           <a
+            className="repo"
             href="https://github.com/dharmarajatulya1-hub/sdkdrift"
             onClick={() => track("github_clicked", { location: "hero" })}
             target="_blank"
@@ -78,13 +82,42 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="how">
-        <h2>How it works</h2>
-        <ol>
-          <li>Parse OpenAPI operations and schemas</li>
-          <li>Scan public SDK surface for Python or TypeScript</li>
-          <li>Match, diff, score, and report drift findings</li>
-        </ol>
+      <section className="grid3">
+        <article className="panel card">
+          <h3>Catch Missing Endpoints</h3>
+          <p>Find API operations that exist in spec but not in SDK method surface.</p>
+        </article>
+        <article className="panel card">
+          <h3>Track Type and Param Drift</h3>
+          <p>Detect required param additions and type mismatches before release.</p>
+        </article>
+        <article className="panel card">
+          <h3>Gate in CI</h3>
+          <p>Fail builds with `--min-score` when SDK quality drops below threshold.</p>
+        </article>
+      </section>
+
+      <section className="panel split">
+        <div>
+          <h2>How it works</h2>
+          <ol>
+            <li>Parse OpenAPI operations and parameter schema.</li>
+            <li>Scan SDK public methods for Python or TypeScript.</li>
+            <li>Match, diff, score, and output findings for CI and humans.</li>
+          </ol>
+        </div>
+        <pre>
+{`$ npx @sdkdrift/cli scan \\
+  --spec ./openapi.yaml \\
+  --sdk ./sdk/python \\
+  --lang python \\
+  --min-score 90
+
+SDKDrift Report
+Score: 92/100
+Findings: 1
+- missing_endpoint: getUser`}
+        </pre>
       </section>
 
       <footer className="footer">
