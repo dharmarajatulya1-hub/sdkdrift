@@ -7,17 +7,17 @@ export const metadata: Metadata = {
     default: "SDKDrift",
     template: "%s | SDKDrift"
   },
-  description: "Detect SDK drift between OpenAPI and generated clients before production.",
+  description: "Detect SDK drift before users do. OpenAPI vs SDK contract validation for CI teams.",
   openGraph: {
     title: "SDKDrift",
-    description: "Detect SDK drift before users do.",
+    description: "Catch missing endpoints, param drift, and spec-SDK mismatches before release.",
     type: "website",
     url: "/"
   },
   twitter: {
     card: "summary_large_image",
     title: "SDKDrift",
-    description: "Detect SDK drift between OpenAPI and generated clients."
+    description: "SDK contract checks for CI and release gating."
   }
 };
 

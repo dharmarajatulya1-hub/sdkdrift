@@ -7,6 +7,8 @@ coverage
 *.log
 tests/smoke-report.json
 docs/
+!packages/landing/app/docs/
+!packages/landing/app/docs/page.tsx
 .tmp-real-world/
 validation/real-world/*.report.json
 validation/real-world/*.notes.md
