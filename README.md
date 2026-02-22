@@ -16,12 +16,16 @@ SDKDrift detects drift between your OpenAPI contract and generated SDK surface, 
 
 Asciicast (optional): `https://asciinema.org/a/<cast-id>`
 
+```bash
+sdkdrift scan --spec ./demo/openapi.yaml --sdk ./demo/sdk/python --lang python
+```
+
 ## Quick Start (3 commands)
 
 ```bash
 npm install -g sdkdrift
-sdkdrift init
-sdkdrift check
+sdkdrift scan --help
+sdkdrift scan --spec ./demo/openapi.yaml --sdk ./demo/sdk/python --lang python
 ```
 
 ## Works With

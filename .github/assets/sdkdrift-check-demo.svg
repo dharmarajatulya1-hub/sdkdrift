@@ -18,11 +18,11 @@
   <circle cx="134" cy="76" r="7" fill="#d4ffe2"/>
 
   <text x="168" y="82" fill="#111827" font-size="18" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
-    sdkdrift check
+    sdkdrift scan
   </text>
 
   <text x="90" y="138" fill="#e7f0ff" font-size="24" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
-    $ sdkdrift check
+    $ sdkdrift scan --spec ./demo/openapi.yaml --sdk ./demo/sdk/python --lang python
   </text>
 
   <text x="90" y="178" fill="#f4f7ff" font-size="20" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
@@ -52,7 +52,7 @@
   </text>
 
   <text x="90" y="448" fill="#ff8a8a" font-size="22" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
-    ✖ Drift detected. Failing check.
+    ✖ Drift detected.
   </text>
 
   <text x="90" y="505" fill="#7de0cf" font-size="18" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
