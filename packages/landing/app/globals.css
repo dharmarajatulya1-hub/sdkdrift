@@ -2,13 +2,13 @@
   --font-body: "Avenir Next", "Plus Jakarta Sans", "Segoe UI", sans-serif;
   --font-display: "Satoshi", "Avenir Next Condensed", "Trebuchet MS", sans-serif;
   --font-mono: "IBM Plex Mono", "Menlo", "Consolas", monospace;
-  --bg-0: #f5f9ff;
-  --bg-1: #ebf3ff;
+  --bg-0: #f7faff;
+  --bg-1: #edf4ff;
   --ink-0: #101a2b;
   --ink-1: #2f3e57;
   --ink-soft: #4f5f79;
-  --line: rgba(134, 160, 202, 0.35);
-  --panel: rgba(255, 255, 255, 0.72);
+  --line: rgba(128, 154, 198, 0.28);
+  --panel: rgba(255, 255, 255, 0.82);
   --brand: #0a6cff;
   --brand-strong: #084baf;
   --mint: #08a5a2;
@@ -30,9 +30,9 @@ body {
   font-family: var(--font-body), sans-serif;
   min-height: 100vh;
   background:
-    radial-gradient(circle at 15% 10%, rgba(21, 183, 158, 0.22), transparent 34%),
-    radial-gradient(circle at 88% 18%, rgba(10, 108, 255, 0.2), transparent 36%),
-    radial-gradient(circle at 52% 92%, rgba(255, 167, 100, 0.24), transparent 34%),
+    radial-gradient(circle at 15% 10%, rgba(21, 183, 158, 0.16), transparent 34%),
+    radial-gradient(circle at 88% 18%, rgba(10, 108, 255, 0.14), transparent 36%),
+    radial-gradient(circle at 52% 92%, rgba(255, 167, 100, 0.15), transparent 34%),
     linear-gradient(160deg, var(--bg-0), var(--bg-1));
 }
 
@@ -56,17 +56,17 @@ code {
   background: var(--panel);
   border: 1px solid var(--line);
   box-shadow:
-    0 24px 56px rgba(14, 37, 73, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(18px) saturate(150%);
-  -webkit-backdrop-filter: blur(18px) saturate(150%);
+    0 18px 40px rgba(14, 37, 73, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
 }
 
 .landing {
   position: relative;
-  max-width: 1160px;
+  max-width: 1180px;
   margin: 0 auto;
-  padding: 20px 18px 90px;
+  padding: 22px 18px 92px;
 }
 
 .ambient {
@@ -82,7 +82,7 @@ code {
   height: 260px;
   right: -10px;
   top: 80px;
-  background: rgba(10, 108, 255, 0.38);
+  background: rgba(10, 108, 255, 0.28);
 }
 
 .ambientTwo {
@@ -90,7 +90,7 @@ code {
   height: 220px;
   left: -30px;
   top: 420px;
-  background: rgba(8, 165, 162, 0.38);
+  background: rgba(8, 165, 162, 0.28);
 }
 
 .ambientThree {
@@ -98,16 +98,16 @@ code {
   height: 230px;
   right: 28%;
   bottom: 140px;
-  background: rgba(255, 167, 100, 0.34);
+  background: rgba(255, 167, 100, 0.24);
 }
 
 .topNav {
   position: sticky;
   top: 12px;
   z-index: 40;
-  border-radius: 16px;
-  margin-bottom: 14px;
-  padding: 12px 16px;
+  border-radius: 14px;
+  margin-bottom: 10px;
+  padding: 12px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -116,7 +116,7 @@ code {
 .wordmark {
   text-decoration: none;
   font-family: var(--font-display), sans-serif;
-  font-size: 1.1rem;
+  font-size: 1.04rem;
   font-weight: 800;
   color: var(--ink-0);
 }
@@ -128,19 +128,51 @@ code {
 }
 
 .topNav nav a {
-  font-size: 0.9rem;
+  font-size: 0.86rem;
   color: var(--ink-1);
   text-decoration: none;
   font-weight: 600;
 }
 
+.trustRail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.trustRail p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.trustRail div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.trustRail span {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(125, 150, 191, 0.3);
+  color: var(--ink-1);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 5px 10px;
+}
+
 .hero {
   position: relative;
-  border-radius: 24px;
-  padding: 32px;
+  border-radius: 20px;
+  padding: 36px;
   display: grid;
   grid-template-columns: 1.15fr 1fr;
-  gap: 18px;
+  gap: 20px;
 }
 
 .eyebrow {
@@ -153,20 +185,20 @@ code {
 }
 
 .hero h1 {
-  font-size: clamp(2.1rem, 5vw, 4rem);
-  line-height: 0.98;
-  margin: 12px 0 12px;
+  font-size: clamp(2.2rem, 5vw, 4.2rem);
+  line-height: 0.94;
+  margin: 12px 0 14px;
 }
 
 .sub {
   margin: 0;
   color: var(--ink-1);
-  line-height: 1.6;
+  line-height: 1.68;
   max-width: 68ch;
 }
 
 .heroCtas {
-  margin-top: 22px;
+  margin-top: 24px;
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
@@ -175,7 +207,7 @@ code {
 .btn {
   text-decoration: none;
   border-radius: 999px;
-  padding: 11px 18px;
+  padding: 12px 20px;
   font-weight: 700;
   font-size: 0.92rem;
 }
@@ -183,7 +215,7 @@ code {
 .btnPrimary {
   color: #ffffff;
   background: linear-gradient(135deg, var(--brand), var(--brand-strong));
-  box-shadow: 0 12px 26px rgba(8, 76, 168, 0.3);
+  box-shadow: 0 10px 24px rgba(8, 76, 168, 0.28);
 }
 
 .btnGhost {
@@ -193,7 +225,7 @@ code {
 }
 
 .inlineRow {
-  margin-top: 16px;
+  margin-top: 14px;
   display: flex;
   gap: 10px;
   align-items: center;
@@ -206,8 +238,36 @@ code {
   color: #d6f1ff;
   border-radius: 10px;
   padding: 8px 10px;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   cursor: pointer;
+}
+
+.metricRow {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.metricRow article {
+  border-radius: 12px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(131, 157, 196, 0.3);
+}
+
+.metricRow p {
+  margin: 0;
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.metricRow span {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.74rem;
+  color: var(--ink-soft);
 }
 
 .repoLink {
@@ -217,7 +277,7 @@ code {
 }
 
 .demoPanel {
-  border-radius: 18px;
+  border-radius: 16px;
   border: 1px solid rgba(116, 153, 210, 0.45);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(243, 249, 255, 0.75));
   padding: 14px;
@@ -267,14 +327,14 @@ code {
   color: #d8f1ff;
   border: 1px solid rgba(113, 169, 255, 0.35);
   padding: 14px;
-  min-height: 164px;
-  font-size: 0.8rem;
+  min-height: 184px;
+  font-size: 0.78rem;
   line-height: 1.55;
   overflow: auto;
 }
 
 .painStrip {
-  margin-top: 22px;
+  margin-top: 28px;
 }
 
 .painStrip h2 {
@@ -285,18 +345,18 @@ code {
 .painGrid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
+  gap: 12px;
 }
 
 .painGrid article {
-  border-radius: 14px;
-  padding: 14px;
+  border-radius: 13px;
+  padding: 15px;
   border: 1px solid rgba(130, 156, 197, 0.42);
   background: rgba(255, 255, 255, 0.62);
 }
 
 .painGrid h3 {
-  margin: 0 0 8px;
+  margin: 0 0 7px;
   font-size: 0.95rem;
 }
 
@@ -307,8 +367,42 @@ code {
   line-height: 1.5;
 }
 
+.flowSteps {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.flowSteps article {
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.flowSteps span {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: rgba(10, 108, 255, 0.12);
+  color: var(--brand-strong);
+  font-size: 0.73rem;
+  font-weight: 700;
+}
+
+.flowSteps h3 {
+  margin: 10px 0 8px;
+  font-size: 0.98rem;
+}
+
+.flowSteps p {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--ink-1);
+  line-height: 1.5;
+}
+
 .cardsThree {
-  margin-top: 18px;
+  margin-top: 16px;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
@@ -342,7 +436,7 @@ code {
 }
 
 .codeSection {
-  margin-top: 18px;
+  margin-top: 24px;
   border-radius: 20px;
   padding: 24px;
   display: grid;
@@ -410,7 +504,7 @@ code {
 .statusBoard,
 .story,
 .waitlistSection {
-  margin-top: 18px;
+  margin-top: 24px;
 }
 
 .identity h2,
@@ -645,6 +739,11 @@ code {
     grid-template-columns: 1fr;
   }
 
+  .metricRow,
+  .flowSteps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .painGrid,
   .cardsThree,
   .storyGrid,
@@ -671,15 +770,17 @@ code {
   }
 
   .hero {
-    padding: 22px;
+    padding: 24px 20px;
   }
 
   .painGrid,
+  .flowSteps,
   .cardsThree,
   .storyGrid,
   .postGrid,
   .identityGrid,
-  .codeGrid {
+  .codeGrid,
+  .metricRow {
     grid-template-columns: 1fr;
   }
 

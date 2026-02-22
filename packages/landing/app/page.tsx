@@ -85,6 +85,16 @@ export default function LandingPage() {
         </nav>
       </header>
 
+      <section className="trustRail">
+        <p>Built for API platform teams shipping multi-language SDKs.</p>
+        <div>
+          <span>OpenAPI-first</span>
+          <span>CI gating</span>
+          <span>JSON artifacts</span>
+          <span>Drift confidence scoring</span>
+        </div>
+      </section>
+
       <section className="hero glass">
         <div className="heroCopy">
           <p className="eyebrow">Open Source SDK Contract Validation</p>
@@ -118,6 +128,21 @@ export default function LandingPage() {
             >
               View Source
             </a>
+          </div>
+
+          <div className="metricRow">
+            <article>
+              <p>63%</p>
+              <span>OpenAI surface matched in latest run</span>
+            </article>
+            <article>
+              <p>56.5%</p>
+              <span>Noise reduction from baseline output</span>
+            </article>
+            <article>
+              <p>0</p>
+              <span>Remaining array/list type mismatch class</span>
+            </article>
           </div>
         </div>
 
@@ -169,6 +194,24 @@ export default function LandingPage() {
             <p>One SDK catches up, others lag, and support load spikes across customer segments.</p>
           </article>
         </div>
+      </section>
+
+      <section className="flowSteps">
+        <article className="glass">
+          <span>Step 1</span>
+          <h3>Scan contract + SDK surface</h3>
+          <p>Parse OpenAPI operations and extract real callable SDK methods.</p>
+        </article>
+        <article className="glass">
+          <span>Step 2</span>
+          <h3>Classify actionable vs coverage</h3>
+          <p>Separate release blockers from informational unsupported groups.</p>
+        </article>
+        <article className="glass">
+          <span>Step 3</span>
+          <h3>Gate releases in CI</h3>
+          <p>Use thresholds and artifacts to prevent silent contract drift.</p>
+        </article>
       </section>
 
       <section className="cardsThree">
