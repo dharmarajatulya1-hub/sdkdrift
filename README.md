@@ -106,6 +106,45 @@ jobs:
       - run: npx @sdkdrift/cli scan --spec ./openapi.yaml --sdk ./sdk/python --lang python --min-score 90
 ```
 
+## GitHub Action Wrapper
+
+Use SDKDrift directly as a reusable GitHub Action:
+
+```yaml
+name: SDK Drift Check
+on: [pull_request]
+
+jobs:
+  sdkdrift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dharmarajatulya1-hub/sdkdrift@main
+        with:
+          spec: ./openapi.yaml
+          sdk: ./sdk/python
+          lang: python
+          min-score: 90
+          format: json
+          out: sdkdrift.report.json
+```
+
+Supported action inputs:
+
+- `spec` (required): OpenAPI path/URL
+- `sdk` (required): SDK directory
+- `lang` (required): `python` or `ts`
+- `min-score` (optional): fail threshold
+- `format` (optional): `terminal|json|markdown` (default `terminal`)
+- `config` (optional): config path
+- `out` (optional): report path (default `sdkdrift.report.json`)
+- `verbose` (optional): `true|false`
+- `cli-version` (optional): npm version, default `latest`
+- `node-version` (optional): default `20`
+- `working-directory` (optional): default `.`
+- `upload-artifact` (optional): default `true`
+- `artifact-name` (optional): default `sdkdrift-report`
+
 ## Packages
 
 - `@sdkdrift/cli`: command-line interface

@@ -1,0 +1,105 @@
+name: "SDKDrift Scan"
+description: "Run sdkdrift scan against an OpenAPI spec and SDK surface"
+
+inputs:
+  spec:
+    description: "OpenAPI file path or URL"
+    required: true
+  sdk:
+    description: "SDK root directory path"
+    required: true
+  lang:
+    description: "SDK language (python|ts)"
+    required: true
+  min-score:
+    description: "Fail when score is lower than this threshold"
+    required: false
+    default: ""
+  format:
+    description: "Output format (terminal|json|markdown)"
+    required: false
+    default: "terminal"
+  config:
+    description: "Path to sdkdrift.config.yaml"
+    required: false
+    default: ""
+  out:
+    description: "Output report file path"
+    required: false
+    default: "sdkdrift.report.json"
+  verbose:
+    description: "Emit matcher diagnostics"
+    required: false
+    default: "false"
+  cli-version:
+    description: "CLI package version (e.g. 0.2.0 or latest)"
+    required: false
+    default: "latest"
+  node-version:
+    description: "Node.js version used to run sdkdrift"
+    required: false
+    default: "20"
+  working-directory:
+    description: "Directory to run the scan from"
+    required: false
+    default: "."
+  upload-artifact:
+    description: "Upload the report file as a workflow artifact"
+    required: false
+    default: "true"
+  artifact-name:
+    description: "Artifact name for uploaded report"
+    required: false
+    default: "sdkdrift-report"
+
+outputs:
+  report-path:
+    description: "Path of the generated report file"
+    value: ${{ steps.scan.outputs.report_path }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Run SDKDrift scan
+      id: scan
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        set -euo pipefail
+
+        cmd=(npx --yes "@sdkdrift/cli@${{ inputs.cli-version }}" scan \
+          --spec "${{ inputs.spec }}" \
+          --sdk "${{ inputs.sdk }}" \
+          --lang "${{ inputs.lang }}" \
+          --format "${{ inputs.format }}")
+
+        if [[ -n "${{ inputs.config }}" ]]; then
+          cmd+=(--config "${{ inputs.config }}")
+        fi
+
+        if [[ -n "${{ inputs.min-score }}" ]]; then
+          cmd+=(--min-score "${{ inputs.min-score }}")
+        fi
+
+        if [[ "${{ inputs.verbose }}" == "true" ]]; then
+          cmd+=(--verbose)
+        fi
+
+        if [[ -n "${{ inputs.out }}" ]]; then
+          cmd+=(--out "${{ inputs.out }}")
+          echo "report_path=${{ inputs.out }}" >> "$GITHUB_OUTPUT"
+        fi
+
+        "${cmd[@]}"
+
+    - name: Upload report artifact
+      if: ${{ inputs.upload-artifact == 'true' && inputs.out != '' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ inputs.working-directory }}/${{ inputs.out }}
