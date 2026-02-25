@@ -72,6 +72,11 @@ runs:
       run: |
         set -euo pipefail
 
+        workdir="${{ inputs.working-directory }}"
+        out_path="${{ inputs.out }}"
+        workdir="${workdir#./}"
+        out_path="${out_path#./}"
+
         cmd=(npx --yes "@sdkdrift/cli@${{ inputs.cli-version }}" scan \
           --spec "${{ inputs.spec }}" \
           --sdk "${{ inputs.sdk }}" \
@@ -90,9 +95,15 @@ runs:
           cmd+=(--verbose)
         fi
 
-        if [[ -n "${{ inputs.out }}" ]]; then
-          cmd+=(--out "${{ inputs.out }}")
-          echo "report_path=${{ inputs.out }}" >> "$GITHUB_OUTPUT"
+        if [[ -n "${out_path}" ]]; then
+          cmd+=(--out "${out_path}")
+          if [[ -z "${workdir}" || "${workdir}" == "." ]]; then
+            artifact_path="${out_path}"
+          else
+            artifact_path="${workdir}/${out_path}"
+          fi
+          echo "report_path=${artifact_path}" >> "$GITHUB_OUTPUT"
+          echo "artifact_path=${artifact_path}" >> "$GITHUB_OUTPUT"
         fi
 
         "${cmd[@]}"
@@ -102,4 +113,4 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.artifact-name }}
-        path: ${{ inputs.working-directory }}/${{ inputs.out }}
+        path: ${{ steps.scan.outputs.artifact_path }}
