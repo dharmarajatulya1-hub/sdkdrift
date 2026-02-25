@@ -92,6 +92,7 @@ export default function LandingPage() {
             SDKDrift compares OpenAPI contracts with real SDK surfaces and tells you what is broken before customers
             discover it.
           </p>
+          <p className="featurePill">New: GitHub Action wrapper for CI gating</p>
 
           <div className="heroActions">
             <a href="#getting-started" className="btn btnPrimary" onClick={() => track("cta_run_repo_clicked")}>
@@ -177,30 +178,56 @@ export default function LandingPage() {
       <section id="getting-started" className="neoStart">
         <div>
           <p className="eyebrow">Quick start</p>
-          <h2>Run one command. Add the report to CI.</h2>
+          <h2>Run one command. Or drop in the GitHub Action wrapper.</h2>
         </div>
-        <div className="singleCode">
-          <header>
-            <h3>CLI scan</h3>
-            <button
-              type="button"
-              onClick={() =>
-                copyText(
-                  "npx @sdkdrift/cli scan --spec ./openapi.yaml --sdk ./sdk/python --lang python --format json --out ./sdkdrift.report.json --min-score 90",
-                  "copy_scan_command_clicked"
-                )
-              }
-            >
-              Copy
-            </button>
-          </header>
-          <pre>{`npx @sdkdrift/cli scan \\
+        <div className="startGrid">
+          <div className="singleCode">
+            <header>
+              <h3>CLI scan</h3>
+              <button
+                type="button"
+                onClick={() =>
+                  copyText(
+                    "npx @sdkdrift/cli scan --spec ./openapi.yaml --sdk ./sdk/python --lang python --format json --out ./sdkdrift.report.json --min-score 90",
+                    "copy_scan_command_clicked"
+                  )
+                }
+              >
+                Copy
+              </button>
+            </header>
+            <pre>{`npx @sdkdrift/cli scan \\
   --spec ./openapi.yaml \\
   --sdk ./sdk/python \\
   --lang python \\
   --format json \\
   --out ./sdkdrift.report.json \\
   --min-score 90`}</pre>
+          </div>
+          <div className="singleCode">
+            <header>
+              <h3>GitHub Action wrapper</h3>
+              <button
+                type="button"
+                onClick={() =>
+                  copyText(
+                    "- uses: dharmarajatulya1-hub/sdkdrift@v0.3.0\n  with:\n    spec: ./openapi.yaml\n    sdk: ./sdk/python\n    lang: python\n    min-score: 90\n    format: json\n    out: sdkdrift.report.json",
+                    "copy_action_wrapper_clicked"
+                  )
+                }
+              >
+                Copy
+              </button>
+            </header>
+            <pre>{`- uses: dharmarajatulya1-hub/sdkdrift@v0.3.0
+  with:
+    spec: ./openapi.yaml
+    sdk: ./sdk/python
+    lang: python
+    min-score: 90
+    format: json
+    out: sdkdrift.report.json`}</pre>
+          </div>
         </div>
       </section>
 

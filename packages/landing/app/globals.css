@@ -153,6 +153,19 @@ code {
   line-height: 1.78;
 }
 
+.featurePill {
+  margin: 14px 0 0;
+  width: fit-content;
+  border-radius: 999px;
+  border: 1px solid rgba(10, 143, 121, 0.35);
+  background: rgba(10, 143, 121, 0.12);
+  color: #165c51;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 6px 11px;
+}
+
 .heroActions {
   margin-top: 28px;
   display: flex;
@@ -324,6 +337,16 @@ code {
   overflow: hidden;
   background: rgba(255, 255, 255, 0.8);
   border: 1px solid var(--line);
+}
+
+.startGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.startGrid .singleCode {
+  margin-top: 18px;
 }
 
 .singleCode header {
@@ -533,6 +556,7 @@ code {
 
   .neoValueGrid,
   .neoStats,
+  .startGrid,
   .postGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -611,6 +635,7 @@ code {
 
   .neoValueGrid,
   .neoStats,
+  .startGrid,
   .postGrid {
     grid-template-columns: 1fr;
   }
