@@ -28,6 +28,25 @@ jobs:
       - name: Verify output file exists
         run: test -f "${{ steps.sdkdrift.outputs.report-path }}"
 
+      - name: Publish SDKDrift summary
+        run: |
+          REPORT_PATH="${{ steps.sdkdrift.outputs.report-path }}"
+          node -e '
+            const fs = require("node:fs");
+            const path = process.env.REPORT_PATH;
+            const r = JSON.parse(fs.readFileSync(path, "utf8"));
+            const summary = [
+              "### SDKDrift Self-Test (python fixture)",
+              "",
+              `- Score: **${r.score}**`,
+              `- Operations matched: **${r.summary.operationsMatched}/${r.summary.operationsTotal}**`,
+              `- Findings: **${r.summary.findingsTotal}**`,
+              `- Actionable: **${r.summary.actionableFindingsTotal ?? 0}**`,
+              `- Coverage notes: **${r.summary.coverageNotesTotal ?? 0}**`
+            ].join("\n");
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${summary}\n\n`);
+          '
+
   wrapper-ts:
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -49,3 +68,22 @@ jobs:
 
       - name: Verify output file exists
         run: test -f "${{ steps.sdkdrift.outputs.report-path }}"
+
+      - name: Publish SDKDrift summary
+        run: |
+          REPORT_PATH="${{ steps.sdkdrift.outputs.report-path }}"
+          node -e '
+            const fs = require("node:fs");
+            const path = process.env.REPORT_PATH;
+            const r = JSON.parse(fs.readFileSync(path, "utf8"));
+            const summary = [
+              "### SDKDrift Self-Test (ts fixture)",
+              "",
+              `- Score: **${r.score}**`,
+              `- Operations matched: **${r.summary.operationsMatched}/${r.summary.operationsTotal}**`,
+              `- Findings: **${r.summary.findingsTotal}**`,
+              `- Actionable: **${r.summary.actionableFindingsTotal ?? 0}**`,
+              `- Coverage notes: **${r.summary.coverageNotesTotal ?? 0}**`
+            ].join("\n");
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${summary}\n\n`);
+          '
