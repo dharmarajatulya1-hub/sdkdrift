@@ -1,0 +1,51 @@
+name: Action Self Test
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  wrapper-python:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run wrapper (python fixture)
+        id: sdkdrift
+        uses: ./
+        with:
+          spec: ./fixtures/simple/openapi.yaml
+          sdk: ./fixtures/simple/sdk/python
+          lang: python
+          format: json
+          out: ./tests/action-self-test-python.report.json
+          min-score: 10
+          artifact-name: sdkdrift-self-test-python
+
+      - name: Verify output file exists
+        run: test -f "${{ steps.sdkdrift.outputs.report-path }}"
+
+  wrapper-ts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run wrapper (ts fixture)
+        id: sdkdrift
+        uses: ./
+        with:
+          spec: ./fixtures/cases/ts-basic/openapi.yaml
+          sdk: ./fixtures/cases/ts-basic/sdk/ts
+          lang: ts
+          format: json
+          out: ./tests/action-self-test-ts.report.json
+          min-score: 90
+          artifact-name: sdkdrift-self-test-ts
+
+      - name: Verify output file exists
+        run: test -f "${{ steps.sdkdrift.outputs.report-path }}"

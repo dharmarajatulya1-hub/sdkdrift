@@ -10,6 +10,12 @@ Detect when your generated SDKs drift from your OpenAPI spec.
 
 SDKDrift detects drift between your OpenAPI contract and generated SDK surface, reports actionable mismatches, and gives you a score you can gate in CI.
 
+## Highlights
+
+- Reusable **GitHub Action wrapper** for CI gating in any repo
+- Drift findings split into actionable issues vs coverage notes
+- Configurable score threshold (`--min-score`) for release blocking
+
 ## Demo
 
 ![SDKDrift demo - check finding drift](./.github/assets/sdkdrift-check-demo.svg)
@@ -128,6 +134,19 @@ jobs:
           format: json
           out: sdkdrift.report.json
 ```
+
+What this wrapper does:
+
+1. Sets up Node.
+2. Runs `npx @sdkdrift/cli scan ...` with your inputs.
+3. Optionally uploads the generated report as a workflow artifact.
+4. Fails the job if SDKDrift exits non-zero (including score threshold failures).
+
+Recommended usage:
+
+- Pin to a release tag instead of `main` in production workflows.
+- Use `format: json` with `out:` for machine-readable artifacts.
+- Set `min-score` so PRs fail when drift exceeds your tolerance.
 
 Supported action inputs:
 
