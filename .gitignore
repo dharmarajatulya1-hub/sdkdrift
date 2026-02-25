@@ -13,3 +13,6 @@ docs/**
 .tmp-real-world/
 validation/real-world/*.report.json
 validation/real-world/*.notes.md
+LAUNCH_READINESS.md
+scripts/real-world-validation.sh
+validation/
