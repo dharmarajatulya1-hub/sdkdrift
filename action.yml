@@ -51,11 +51,30 @@ inputs:
     description: "Artifact name for uploaded report"
     required: false
     default: "sdkdrift-report"
+  publish-summary:
+    description: "Generate and publish a markdown summary (requires format=json)"
+    required: false
+    default: "true"
+  summary-file:
+    description: "Path to generated markdown summary file"
+    required: false
+    default: "sdkdrift.summary.md"
+  summary-max-findings:
+    description: "Maximum actionable findings to include in the markdown summary"
+    required: false
+    default: "10"
+  summary-artifact-name:
+    description: "Artifact name for uploaded markdown summary"
+    required: false
+    default: "sdkdrift-summary"
 
 outputs:
   report-path:
     description: "Path of the generated report file"
     value: ${{ steps.scan.outputs.report_path }}
+  summary-path:
+    description: "Path of the generated markdown summary file"
+    value: ${{ steps.summary.outputs.summary_path }}
 
 runs:
   using: "composite"
@@ -114,3 +133,66 @@ runs:
       with:
         name: ${{ inputs.artifact-name }}
         path: ${{ steps.scan.outputs.artifact_path }}
+
+    - name: Generate markdown summary
+      id: summary
+      if: ${{ inputs.publish-summary == 'true' && inputs.format == 'json' && inputs.out != '' }}
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        set -euo pipefail
+
+        workdir="${{ inputs.working-directory }}"
+        out_path="${{ inputs.out }}"
+        summary_file="${{ inputs.summary-file }}"
+        max_findings="${{ inputs.summary-max-findings }}"
+        workdir="${workdir#./}"
+        out_path="${out_path#./}"
+        summary_file="${summary_file#./}"
+
+        node - "$out_path" "$summary_file" "$max_findings" <<'NODE'
+        const fs = require("node:fs");
+        const [reportPath, summaryPath, maxFindingsRaw] = process.argv.slice(2);
+        const report = JSON.parse(fs.readFileSync(reportPath, "utf8"));
+        const maxFindings = Number(maxFindingsRaw) > 0 ? Number(maxFindingsRaw) : 10;
+        const actionable = (report.actionableFindings ?? report.findings ?? []).slice(0, maxFindings);
+        const coverage = report.coverageNotes ?? [];
+        const unmatchedReasons = report.summary?.unmatchedReasons ?? {};
+        const unmatchedText = Object.keys(unmatchedReasons).length
+          ? Object.entries(unmatchedReasons).map(([k, v]) => `${k}: ${v}`).join(", ")
+          : "none";
+
+        const lines = [
+          "## SDKDrift Summary",
+          "",
+          `- Score: **${report.score}/100**`,
+          `- Operations matched: **${report.summary.operationsMatched}/${report.summary.operationsTotal}**`,
+          `- Findings: **${report.summary.findingsTotal}**`,
+          `- Actionable findings: **${report.summary.actionableFindingsTotal ?? actionable.length}**`,
+          `- Coverage notes: **${report.summary.coverageNotesTotal ?? coverage.length}**`,
+          `- Unmatched reasons: ${unmatchedText}`,
+          "",
+          "### Top Actionable Findings",
+          actionable.length
+            ? actionable.map((f) => `- **${f.severity}** \`${f.category}\`: ${f.message}`).join("\n")
+            : "- None"
+        ];
+
+        fs.writeFileSync(summaryPath, `${lines.join("\n")}\n`, "utf8");
+        NODE
+
+        if [[ -z "${workdir}" || "${workdir}" == "." ]]; then
+          summary_artifact_path="${summary_file}"
+        else
+          summary_artifact_path="${workdir}/${summary_file}"
+        fi
+
+        echo "summary_path=${summary_artifact_path}" >> "$GITHUB_OUTPUT"
+        cat "${summary_file}" >> "$GITHUB_STEP_SUMMARY"
+
+    - name: Upload summary artifact
+      if: ${{ inputs.upload-artifact == 'true' && steps.summary.outputs.summary_path != '' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.summary-artifact-name }}
+        path: ${{ steps.summary.outputs.summary_path }}

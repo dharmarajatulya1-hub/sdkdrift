@@ -139,7 +139,8 @@ What this wrapper does:
 
 1. Sets up Node.
 2. Runs `npx @sdkdrift/cli scan ...` with your inputs.
-3. Optionally uploads the generated report as a workflow artifact.
+3. Generates a markdown summary from JSON output and publishes it in the workflow Summary UI.
+4. Optionally uploads the generated report and markdown summary as workflow artifacts.
 4. Fails the job if SDKDrift exits non-zero (including score threshold failures).
 
 Recommended usage:
@@ -163,6 +164,10 @@ Supported action inputs:
 - `working-directory` (optional): default `.`
 - `upload-artifact` (optional): default `true`
 - `artifact-name` (optional): default `sdkdrift-report`
+- `publish-summary` (optional): generate markdown summary from JSON output, default `true`
+- `summary-file` (optional): summary markdown path, default `sdkdrift.summary.md`
+- `summary-max-findings` (optional): actionable findings shown in summary, default `10`
+- `summary-artifact-name` (optional): summary artifact name, default `sdkdrift-summary`
 
 ## Packages
 
