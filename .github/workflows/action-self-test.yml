@@ -24,6 +24,7 @@ jobs:
           out: ./tests/action-self-test-python.report.json
           min-score: 10
           artifact-name: sdkdrift-self-test-python
+          summary-artifact-name: sdkdrift-summary-python
 
       - name: Verify output file exists
         run: test -f "${{ steps.sdkdrift.outputs.report-path }}"
@@ -46,6 +47,7 @@ jobs:
           out: ./tests/action-self-test-ts.report.json
           min-score: 90
           artifact-name: sdkdrift-self-test-ts
+          summary-artifact-name: sdkdrift-summary-ts
 
       - name: Verify output file exists
         run: test -f "${{ steps.sdkdrift.outputs.report-path }}"
