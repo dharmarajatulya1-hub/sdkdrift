@@ -1,0 +1,39 @@
+openapi: 3.0.3
+info:
+  title: TS Stripe Extend Case
+  version: 1.0.0
+paths:
+  /v1/customers:
+    get:
+      operationId: listCustomers
+      responses:
+        "200":
+          description: ok
+    post:
+      operationId: createCustomer
+      responses:
+        "200":
+          description: ok
+  /v1/customers/{customer}:
+    get:
+      operationId: retrieveCustomer
+      parameters:
+        - in: path
+          name: customer
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ok
+    delete:
+      operationId: deleteCustomer
+      parameters:
+        - in: path
+          name: customer
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ok

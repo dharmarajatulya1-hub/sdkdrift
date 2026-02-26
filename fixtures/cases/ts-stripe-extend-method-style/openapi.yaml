@@ -1,0 +1,23 @@
+openapi: 3.0.3
+info:
+  title: TS Stripe Extend Method Style Case
+  version: 1.0.0
+paths:
+  /oauth/authorize:
+    get:
+      operationId: authorizeUrl
+      responses:
+        "200":
+          description: ok
+  /oauth/token:
+    post:
+      operationId: token
+      responses:
+        "200":
+          description: ok
+  /oauth/deauthorize:
+    post:
+      operationId: deauthorize
+      responses:
+        "200":
+          description: ok

@@ -135,6 +135,22 @@ runCase({
 });
 
 runCase({
+  name: "ts-stripe-extend",
+  spec: "./fixtures/cases/ts-stripe-extend/openapi.yaml",
+  sdk: "./fixtures/cases/ts-stripe-extend/sdk/ts",
+  lang: "ts",
+  expectedScore: 100
+});
+
+runCase({
+  name: "ts-stripe-extend-method-style",
+  spec: "./fixtures/cases/ts-stripe-extend-method-style/openapi.yaml",
+  sdk: "./fixtures/cases/ts-stripe-extend-method-style/sdk/ts",
+  lang: "ts",
+  expectedScore: 100
+});
+
+runCase({
   name: "python-annotated",
   spec: "./fixtures/cases/python-annotated/openapi.yaml",
   sdk: "./fixtures/cases/python-annotated/sdk/python",
