@@ -28,6 +28,9 @@ const demoTabs = {
 } as const;
 
 function copyText(text: string, event: string): void {
+  if (typeof window === "undefined" || !navigator.clipboard) {
+    return;
+  }
   void navigator.clipboard.writeText(text);
   track(event, { source: "landing" });
 }
@@ -65,11 +68,12 @@ export default function LandingPage() {
   }
 
   return (
-    <main className="landing neo">
-      <div className="neoGlow neoGlowOne" />
-      <div className="neoGlow neoGlowTwo" />
+    <main className="landingPage">
+      <div className="mesh meshOne" />
+      <div className="mesh meshTwo" />
+      <div className="mesh meshThree" />
 
-      <header className="neoNav">
+      <header className="siteNav">
         <a className="wordmark" href="/">
           SDKDrift
         </a>
@@ -77,33 +81,44 @@ export default function LandingPage() {
           <a href="/docs">Docs</a>
           <a href="/blog">Blog</a>
           <a href="/roadmap">Roadmap</a>
-          <a href="#waitlist">Waitlist</a>
           <a href="https://github.com/dharmarajatulya1-hub/sdkdrift" target="_blank" rel="noreferrer">
             GitHub
           </a>
         </nav>
+        <a href="#hero-waitlist" className="navWaitlist" onClick={() => track("cta_waitlist_clicked", { location: "nav" })}>
+          Join waitlist
+        </a>
       </header>
 
-      <section className="neoHero">
-        <div className="neoHeroCopy">
+      <section className="heroSection">
+        <div className="heroCopy">
           <p className="eyebrow">Spec and SDK alignment</p>
-          <h1>Design your release process around trust.</h1>
-          <p>
-            SDKDrift compares OpenAPI contracts with real SDK surfaces and tells you what is broken before customers
-            discover it.
+          <h1>Ship SDK changes with confidence, not guesswork.</h1>
+          <p className="lead">
+            SDKDrift compares OpenAPI contracts against real SDK surfaces and isolates actionable drift before broken
+            releases reach production.
           </p>
-          <p className="featurePill">New: GitHub Action wrapper for CI gating</p>
+
+          <form id="hero-waitlist" className="heroWaitlist" onSubmit={onSubmit}>
+            <input
+              type="email"
+              required
+              placeholder="Email address"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              aria-label="Email"
+            />
+            <button type="submit" disabled={status === "saving"}>
+              {status === "saving" ? "Joining..." : "Join waitlist"}
+            </button>
+          </form>
+          {status === "saved" && <p className="ok">You are on the list.</p>}
+          {status === "error" && <p className="err">{errorMessage}</p>}
 
           <div className="heroActions">
-            <a href="#getting-started" className="btn btnPrimary" onClick={() => track("cta_run_repo_clicked")}>
+            <a href="#getting-started" className="inlineCta" onClick={() => track("cta_run_repo_clicked")}>
               Run on your repo
             </a>
-            <a href="#waitlist" className="btn btnGhost" onClick={() => track("cta_waitlist_clicked")}>
-              Join waitlist
-            </a>
-          </div>
-
-          <div className="inlineActions">
             <button
               className="commandChip"
               type="button"
@@ -121,7 +136,7 @@ export default function LandingPage() {
             </a>
           </div>
 
-          <ul className="neoStats">
+          <ul className="metricInline">
             <li>
               <strong>63%</strong>
               <span>OpenAI surface match</span>
@@ -137,51 +152,73 @@ export default function LandingPage() {
           </ul>
         </div>
 
-        <div className="neoConsole" aria-label="Report preview">
-          <div className="previewMeta">
+        <div className="heroPreview" aria-label="Report preview">
+          <div className="previewHead">
             <p className="eyebrow">Live report</p>
-            <h2>Actionable drift, separated from coverage notes.</h2>
+            <h2>Actionable drift separated from coverage notes.</h2>
           </div>
-          <div className="tabRow cleanTabs">
+
+          <div className="tabRow">
             <button type="button" className={activeTab === "summary" ? "active" : ""} onClick={() => setActiveTab("summary")}>
               Summary
             </button>
-            <button type="button" className={activeTab === "actionable" ? "active" : ""} onClick={() => setActiveTab("actionable")}>
+            <button
+              type="button"
+              className={activeTab === "actionable" ? "active" : ""}
+              onClick={() => setActiveTab("actionable")}
+            >
               Actionable
             </button>
             <button type="button" className={activeTab === "coverage" ? "active" : ""} onClick={() => setActiveTab("coverage")}>
               Coverage
             </button>
           </div>
+
           <pre>{demoTabs[activeTab].join("\n")}</pre>
+
+          <div className="previewFoot">
+            <span>Supports CI gating with `--min-score`</span>
+            <span>JSON and terminal output</span>
+          </div>
         </div>
       </section>
 
-      <section className="neoValue">
+      <section className="proofStrip">
+        <p>Release confidence for API-first engineering teams.</p>
+        <ul>
+          <li>OpenAPI vs SDK contract checks</li>
+          <li>Actionable findings first</li>
+          <li>GitHub Action wrapper ready</li>
+        </ul>
+      </section>
+
+      <section className="valueSection">
         <p className="eyebrow">Why teams ship with SDKDrift</p>
-        <div className="neoValueGrid">
+        <h2>Built for shipping teams, not report readers.</h2>
+        <div className="valueRows">
           <article>
             <h3>See parity failures instantly</h3>
-            <p>Spot missing endpoints and required-field changes before they become customer incidents.</p>
+            <p>Missing endpoints and required-field changes are flagged before they become customer incidents.</p>
           </article>
           <article>
             <h3>Keep output operational</h3>
-            <p>Actionable findings are separate from informational coverage so engineering can move fast.</p>
+            <p>Actionable findings are separated from informational coverage so engineering can move quickly.</p>
           </article>
           <article>
             <h3>Automate release standards</h3>
-            <p>Gate CI with `--min-score` and keep drift confidence measurable over time.</p>
+            <p>Gate CI with `--min-score` and enforce SDK quality checks from pull request to release.</p>
           </article>
         </div>
       </section>
 
-      <section id="getting-started" className="neoStart">
-        <div>
+      <section id="getting-started" className="startSection">
+        <div className="startCopy">
           <p className="eyebrow">Quick start</p>
-          <h2>Run one command. Or drop in the GitHub Action wrapper.</h2>
+          <h2>Run once locally, then gate every commit in CI.</h2>
         </div>
-        <div className="startGrid">
-          <div className="singleCode">
+
+        <div className="codeRail">
+          <article className="codeBlock">
             <header>
               <h3>CLI scan</h3>
               <button
@@ -203,8 +240,9 @@ export default function LandingPage() {
   --format json \\
   --out ./sdkdrift.report.json \\
   --min-score 90`}</pre>
-          </div>
-          <div className="singleCode">
+          </article>
+
+          <article className="codeBlock">
             <header>
               <h3>GitHub Action wrapper</h3>
               <button
@@ -227,28 +265,8 @@ export default function LandingPage() {
     min-score: 90
     format: json
     out: sdkdrift.report.json`}</pre>
-          </div>
+          </article>
         </div>
-      </section>
-
-      <section id="waitlist" className="neoWaitlist">
-        <p className="eyebrow">Early access</p>
-        <h2>Get launch updates for GitHub Action and hosted monitoring.</h2>
-        <form className="waitlistForm" onSubmit={onSubmit}>
-          <input
-            type="email"
-            required
-            placeholder="Email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            aria-label="Email"
-          />
-          <button type="submit" disabled={status === "saving"}>
-            {status === "saving" ? "Joining..." : "Join waitlist"}
-          </button>
-        </form>
-        {status === "saved" && <p className="ok">You are on the list.</p>}
-        {status === "error" && <p className="err">{errorMessage}</p>}
       </section>
 
       <footer className="footer">
