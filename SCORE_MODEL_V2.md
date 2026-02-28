@@ -34,3 +34,4 @@ SDKDrift v2 exposes dual scores:
 ## Notes
 - v2 keeps `deductions`/`weightedDeductions` for migration stability.
 - v2 adds `categoryCounts`/`weightedImpact` as clearer semantics.
+- Calibration quality is tracked in benchmark output using ECE and Brier score from gold-labeled records.

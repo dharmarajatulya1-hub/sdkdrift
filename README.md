@@ -186,6 +186,12 @@ Supported action inputs:
 - `@sdkdrift/core`: parser, matcher, diff, scoring engine
 - `@sdkdrift/python-scanner`: language scanner package
 
+## Benchmark and Calibration
+
+- `npm run benchmark:run`: evaluates pinned real-world reports plus gold labels.
+- Gold labels file: `benchmark/gold/labeled-operations.v1.json`
+- Manifest and gates: `benchmark.manifest.json`
+
 ## Repository Layout
 
 - `packages/core`: parsing, matching, diffing, scoring

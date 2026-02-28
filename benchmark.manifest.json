@@ -35,8 +35,16 @@
       "reportFile": "validation/real-world/stripe-node-ts.post3.json"
     }
   ],
+  "goldDataset": {
+    "file": "benchmark/gold/labeled-operations.v1.json",
+    "includeBootstrap": true
+  },
   "gates": {
     "minActionableScore": 30,
+    "minGoldRecords": 120,
+    "minReviewedGoldRecords": 20,
+    "maxCalibrationEce": 0.25,
+    "maxCalibrationBrier": 0.2,
     "maxRuntimeMultiplier": 1.8,
     "maxActionableRegressionPercent": 5
   }

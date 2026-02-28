@@ -1,0 +1,1738 @@
+{
+  "version": 1,
+  "generatedAt": "2026-02-28",
+  "description": "Gold labels for benchmark evaluation. Reviewed entries are manually triaged seeds; bootstrap entries are machine-seeded and require review.",
+  "records": [
+    {
+      "target": "ory-kratos-python",
+      "operationId": "listCourierMessages",
+      "reviewStatus": "reviewed",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "type_mismatch"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "ory-kratos-python",
+      "operationId": "listIdentities",
+      "reviewStatus": "reviewed",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "type_mismatch"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "ory-kratos-python",
+      "operationId": "getIdentityByExternalID",
+      "reviewStatus": "reviewed",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "type_mismatch"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "ory-kratos-python",
+      "operationId": "getIdentity",
+      "reviewStatus": "reviewed",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "type_mismatch"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "ory-kratos-python",
+      "operationId": "deleteIdentityCredentials",
+      "reviewStatus": "reviewed",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "type_mismatch"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "ory-kratos-python",
+      "operationId": "listIdentitySessions",
+      "reviewStatus": "reviewed",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "type_mismatch"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "ory-kratos-python",
+      "operationId": "listSessions",
+      "reviewStatus": "reviewed",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "type_mismatch"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "ory-kratos-python",
+      "operationId": "getSession",
+      "reviewStatus": "reviewed",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "type_mismatch"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "ory-kratos-python",
+      "operationId": "listIdentitySchemas",
+      "reviewStatus": "reviewed",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "type_mismatch"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "ory-kratos-python",
+      "operationId": "createNativeLoginFlow",
+      "reviewStatus": "reviewed",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "type_mismatch"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "ory-kratos-python",
+      "operationId": "createBrowserLoginFlow",
+      "reviewStatus": "reviewed",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "type_mismatch"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "ory-kratos-python",
+      "operationId": "updateLogoutFlow",
+      "reviewStatus": "reviewed",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "type_mismatch"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "ory-kratos-python",
+      "operationId": "createBrowserLogoutFlow",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "type_mismatch"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "ory-kratos-python",
+      "operationId": "updateRecoveryFlow",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "type_mismatch"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "ory-kratos-python",
+      "operationId": "createBrowserRecoveryFlow",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "type_mismatch"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "ory-kratos-python",
+      "operationId": "createNativeRegistrationFlow",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "type_mismatch"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "ory-kratos-python",
+      "operationId": "createBrowserRegistrationFlow",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "type_mismatch"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "ory-kratos-python",
+      "operationId": "createBrowserSettingsFlow",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "type_mismatch"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "ory-kratos-python",
+      "operationId": "updateVerificationFlow",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "type_mismatch"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "ory-kratos-python",
+      "operationId": "createNativeVerificationFlow",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "type_mismatch"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "ory-kratos-python",
+      "operationId": "createBrowserVerificationFlow",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "type_mismatch"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "ory-kratos-python",
+      "operationId": "listMySessions",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "type_mismatch"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "ory-kratos-python",
+      "operationId": "toSession",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "type_mismatch"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetAccount",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetAccounts",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetAccountsAccount",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetAccountsAccountBankAccountsId",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit",
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "PostAccountsAccountBankAccountsId",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetAccountsAccountCapabilities",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetAccountsAccountCapabilitiesCapability",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit",
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "PostAccountsAccountCapabilitiesCapability",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetAccountsAccountExternalAccounts",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetAccountsAccountExternalAccountsId",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit",
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "PostAccountsAccountExternalAccountsId",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetAccountsAccountPeople",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetAccountsAccountPeoplePerson",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "PostAccountsAccountPeoplePerson",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetAccountsAccountPersons",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "PostAccountsAccountPersons",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetAccountsAccountPersonsPerson",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit",
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "PostAccountsAccountPersonsPerson",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "missing_endpoint"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "PostAccountsAccountReject",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "missing_endpoint"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetApplePayDomains",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetApplePayDomainsDomain",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetApplicationFees",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetApplicationFeesFeeRefundsId",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "PostApplicationFeesFeeRefundsId",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetApplicationFeesId",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetApplicationFeesIdRefunds",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetAppsSecrets",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "missing_endpoint"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetAppsSecretsFind",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "missing_endpoint"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetBalanceHistoryId",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetBalanceTransactions",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetBalanceTransactionsId",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetBillingAlerts",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetBillingAlertsId",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetBillingCreditBalanceTransactions",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetBillingCreditBalanceTransactionsId",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetBillingCreditGrants",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetBillingCreditGrantsId",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetBillingMeters",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetBillingMetersId",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetBillingMetersIdEventSummaries",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit",
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetBillingPortalConfigurations",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetBillingPortalConfigurationsConfiguration",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetCharges",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetChargesSearch",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit",
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetChargesCharge",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "PostChargesChargeCapture",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "unsupported_resource"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetChargesChargeDispute",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit",
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetChargesChargeRefunds",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit",
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetChargesChargeRefundsRefund",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit",
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "PostChargesChargeRefundsRefund",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "unsupported_resource"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetCheckoutSessions",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetCheckoutSessionsSession",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetCheckoutSessionsSessionLineItems",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetClimateOrders",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetClimateOrdersOrder",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "PostClimateOrdersOrderCancel",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "missing_endpoint"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetClimateProducts",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetClimateProductsProduct",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetClimateSuppliers",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-python",
+      "operationId": "GetClimateSuppliersSupplier",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "param_not_explicit"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetAccount",
+      "reviewStatus": "reviewed",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetAccounts",
+      "reviewStatus": "reviewed",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetAccountsAccount",
+      "reviewStatus": "reviewed",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetAccountsAccountBankAccountsId",
+      "reviewStatus": "reviewed",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "PostAccountsAccountBankAccountsId",
+      "reviewStatus": "reviewed",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetAccountsAccountCapabilities",
+      "reviewStatus": "reviewed",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetAccountsAccountCapabilitiesCapability",
+      "reviewStatus": "reviewed",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param",
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "PostAccountsAccountCapabilitiesCapability",
+      "reviewStatus": "reviewed",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "missing_endpoint"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetAccountsAccountExternalAccounts",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "missing_endpoint"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "PostAccountsAccountExternalAccounts",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "missing_endpoint"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetAccountsAccountExternalAccountsId",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param",
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "PostAccountsAccountExternalAccountsId",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "DeleteAccountsAccountExternalAccountsId",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "PostAccountsAccountLoginLinks",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "missing_endpoint"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetAccountsAccountPeople",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "missing_endpoint"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "PostAccountsAccountPeople",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "missing_endpoint"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetAccountsAccountPeoplePerson",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "missing_endpoint"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "PostAccountsAccountPeoplePerson",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "missing_endpoint"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "DeleteAccountsAccountPeoplePerson",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "missing_endpoint"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetAccountsAccountPersons",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param",
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "PostAccountsAccountPersons",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetAccountsAccountPersonsPerson",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param",
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "PostAccountsAccountPersonsPerson",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "DeleteAccountsAccountPersonsPerson",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetApplePayDomains",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetApplePayDomainsDomain",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "missing_endpoint"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetApplicationFees",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetApplicationFeesFeeRefundsId",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "PostApplicationFeesFeeRefundsId",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetApplicationFeesId",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetApplicationFeesIdRefunds",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "PostApplicationFeesIdRefunds",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "missing_endpoint"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetAppsSecrets",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "missing_endpoint"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "PostAppsSecretsDelete",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "missing_endpoint"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetAppsSecretsFind",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "missing_endpoint"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetBalance",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetBalanceHistory",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "missing_endpoint"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetBalanceHistoryId",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetBalanceSettings",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetBalanceTransactions",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetBalanceTransactionsId",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetBillingAlerts",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetBillingAlertsId",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetBillingCreditBalanceSummary",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param",
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetBillingCreditBalanceTransactions",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetBillingCreditBalanceTransactionsId",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetBillingCreditGrants",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "missing_endpoint"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetBillingCreditGrantsId",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "PostBillingCreditGrantsIdVoid",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "missing_endpoint"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetBillingMeters",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "missing_endpoint"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetBillingMetersId",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "PostBillingMetersId",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetBillingMetersIdEventSummaries",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param",
+          "required_field_added"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetBillingPortalConfigurations",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetBillingPortalConfigurationsConfiguration",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "PostBillingPortalConfigurationsConfiguration",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "missing_endpoint"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetCharges",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetChargesSearch",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "missing_endpoint"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "GetChargesCharge",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": true,
+        "findingCategories": [
+          "changed_param"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    },
+    {
+      "target": "stripe-node-ts",
+      "operationId": "PostChargesCharge",
+      "reviewStatus": "bootstrap",
+      "expected": {
+        "mapped": false,
+        "findingCategories": [
+          "missing_endpoint"
+        ]
+      },
+      "note": "Bootstrapped from current benchmark snapshot; replace with human-reviewed labels."
+    }
+  ]
+}
