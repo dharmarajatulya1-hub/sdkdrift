@@ -66,6 +66,7 @@ sdkdrift scan --spec <pathOrUrl> --sdk <path> --lang <python|ts> [options]
 - `--out <path>`: write report to file
 - `--min-score <0..100>`: fail process when score is lower than threshold
 - `--verbose`: emit matcher diagnostics to stderr
+- `--compat-v1`: emit v1-compatible JSON schema when `--format json` is used
 
 ### Exit Codes
 
@@ -78,10 +79,18 @@ sdkdrift scan --spec <pathOrUrl> --sdk <path> --lang <python|ts> [options]
 ```yaml
 match:
   heuristicThreshold: 0.55
+  mode: precision
+  minConfidenceActionable: 0.7
+  minTop2Margin: 0.08
+  abstainOverGuess: true
 mapping:
   overrides:
     - operationId: listUsers
       sdkMethod: UsersApi.fetch_users
+diff:
+  ignore:
+    extraMethods:
+      - "MiscApi\\.debug_trace"
 ```
 
 Validation rules: `CONFIG_SPEC.md`
@@ -191,6 +200,8 @@ Supported action inputs:
 - `STATUS.md`: project execution status
 - `SCHEMA.md`: JSON report contract
 - `CONFIG_SPEC.md`: config contract
+- `MIGRATION_V2.md`: v2 rollout and compatibility mode
+- `SCORE_MODEL_V2.md`: scoring model details
 - `VALIDATION_REPORT.md`: latest validation summary
 - `RELEASE.md`: release and publish guide
 - `RELEASE_NOTES_v0.2.0.md`: release notes

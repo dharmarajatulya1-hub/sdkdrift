@@ -3,7 +3,19 @@ import { execFileSync } from "node:child_process";
 
 const cli = "./packages/cli/dist/cli.js";
 
-function runCase({ name, spec, sdk, lang, config, expectedCategories = [], expectedScore, minScore, expectExitCode }) {
+function runCase({
+  name,
+  spec,
+  sdk,
+  lang,
+  config,
+  expectedCategories = [],
+  expectedScore,
+  expectedVersion = "2",
+  minScore,
+  expectExitCode,
+  compatV1 = false
+}) {
   const args = [
     cli,
     "scan",
@@ -19,6 +31,9 @@ function runCase({ name, spec, sdk, lang, config, expectedCategories = [], expec
 
   if (config) {
     args.push("--config", config);
+  }
+  if (compatV1) {
+    args.push("--compat-v1");
   }
   if (typeof minScore === "number") {
     args.push("--min-score", String(minScore));
@@ -40,6 +55,7 @@ function runCase({ name, spec, sdk, lang, config, expectedCategories = [], expec
   }
 
   const report = JSON.parse(stdout);
+  assert.equal(report.version, expectedVersion, `${name}: unexpected version`);
   if (typeof expectedScore === 'number') {
     assert.equal(report.score, expectedScore, `${name}: unexpected score`);
   }
@@ -222,6 +238,32 @@ runConfigErrorCase({
   lang: "python",
   config: "./fixtures/cases/invalid-config/sdkdrift.config.yaml",
   expectedError: "heuristicThreshold must be a number between 0 and 1"
+});
+
+runCase({
+  name: "ignore-extra-methods",
+  spec: "./fixtures/cases/ignore-extra-methods/openapi.yaml",
+  sdk: "./fixtures/cases/ignore-extra-methods/sdk/python",
+  lang: "python",
+  config: "./fixtures/cases/ignore-extra-methods/sdkdrift.config.yaml",
+  expectedScore: 100
+});
+
+runCase({
+  name: "param-bag-coverage-note",
+  spec: "./fixtures/cases/param-bag-coverage-note/openapi.yaml",
+  sdk: "./fixtures/cases/param-bag-coverage-note/sdk/python",
+  lang: "python",
+  expectedCategories: ["param_not_explicit"]
+});
+
+runCase({
+  name: "compat-v1-json",
+  spec: "./fixtures/cases/missing-endpoint/openapi.yaml",
+  sdk: "./fixtures/cases/missing-endpoint/sdk/python",
+  lang: "python",
+  expectedVersion: "1",
+  compatV1: true
 });
 
 console.log("All fixture tests passed.");

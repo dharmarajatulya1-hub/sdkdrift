@@ -28,10 +28,16 @@ export async function scanWithArtifacts(
 ): Promise<ScanArtifacts> {
   const operations = await parseOpenApi(options.specPathOrUrl);
   const matches = matchOperations(operations, methods, options.match);
-  const findings = computeDiff(operations, methods, matches);
+  const rawFindings = computeDiff(operations, methods, matches, options.diff);
   const actionableCategories = new Set(["missing_endpoint", "changed_param", "required_field_added", "type_mismatch", "deprecated_mismatch"]);
-  const actionableFindings = findings.filter((finding) => actionableCategories.has(finding.category));
-  const coverageNotes = findings.filter((finding) => !actionableCategories.has(finding.category));
+  const findings = rawFindings.map((finding) => ({
+    ...finding,
+    ruleId: finding.ruleId ?? `rule.${finding.category}`,
+    isActionable: actionableCategories.has(finding.category),
+    evidence: finding.evidence ?? {}
+  }));
+  const actionableFindings = findings.filter((finding) => finding.isActionable);
+  const coverageNotes = findings.filter((finding) => !finding.isActionable);
   const matchedCount = matches.filter((m) => Boolean(m.sdkMethodId)).length;
   const scored = scoreReport(findings, operations.length, matchedCount);
   const unmatchedReasons = matches.reduce<Record<string, number>>((acc, match) => {
@@ -45,8 +51,9 @@ export async function scanWithArtifacts(
     methods,
     matches,
     report: {
-      version: "1",
+      version: "2",
       score: scored.score,
+      scores: scored.scores,
       summary: {
         ...scored.summary,
         actionableFindingsTotal: actionableFindings.length,
@@ -55,6 +62,8 @@ export async function scanWithArtifacts(
       },
       deductions: scored.deductions,
       weightedDeductions: scored.weightedDeductions,
+      categoryCounts: scored.categoryCounts,
+      weightedImpact: scored.weightedImpact,
       findings,
       actionableFindings,
       coverageNotes
@@ -68,11 +77,14 @@ export async function scanWithMethods(
 ): Promise<DriftReport> {
   const artifacts = await scanWithArtifacts(options, methods);
   return {
-    version: "1",
+    version: "2",
     score: artifacts.report.score,
+    scores: artifacts.report.scores,
     summary: artifacts.report.summary,
     deductions: artifacts.report.deductions,
     weightedDeductions: artifacts.report.weightedDeductions,
+    categoryCounts: artifacts.report.categoryCounts,
+    weightedImpact: artifacts.report.weightedImpact,
     findings: artifacts.report.findings,
     actionableFindings: artifacts.report.actionableFindings,
     coverageNotes: artifacts.report.coverageNotes

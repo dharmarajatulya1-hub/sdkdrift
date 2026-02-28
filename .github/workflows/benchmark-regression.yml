@@ -1,0 +1,33 @@
+name: Benchmark Regression
+
+on:
+  pull_request:
+  push:
+    branches: ["main"]
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Fixture Tests
+        run: npm run test:fixtures
+
+      - name: Benchmark Run
+        run: npm run benchmark:run

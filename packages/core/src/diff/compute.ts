@@ -1,4 +1,11 @@
-import type { DriftCategory, DriftFinding, MatchResult, OperationSurface, SdkMethodSurface } from "../types/contracts.js";
+import type {
+  DiffOptions,
+  DriftCategory,
+  DriftFinding,
+  MatchResult,
+  OperationSurface,
+  SdkMethodSurface
+} from "../types/contracts.js";
 
 function normalizeParamName(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -204,8 +211,10 @@ function confidenceForFinding(
   highConfidence: boolean
 ): number {
   if (match.strategy === "unmatched") {
-    if (match.unmatchedReason === "no_matching_resource_in_sdk") return 0.93;
-    if (match.unmatchedReason === "no_matching_action_in_resource") return 0.78;
+    if (match.unmatchedReason === "no_matching_resource_in_sdk" || match.unmatchedReason === "resource_missing") return 0.93;
+    if (match.unmatchedReason === "no_matching_action_in_resource" || match.unmatchedReason === "action_missing") return 0.78;
+    if (match.unmatchedReason === "ambiguous_top_candidates") return 0.46;
+    if (match.unmatchedReason === "scanner_low_evidence") return 0.38;
     if (match.unmatchedReason === "path_based_match_available") return 0.52;
     return 0.4;
   }
@@ -219,15 +228,31 @@ function confidenceForFinding(
 export function computeDiff(
   operations: OperationSurface[],
   methods: SdkMethodSurface[],
-  matches: MatchResult[]
+  matches: MatchResult[],
+  options: DiffOptions = {}
 ): DriftFinding[] {
   const findings: DriftFinding[] = [];
+  const operationsById = new Map(operations.map((operation) => [operation.operationId, operation]));
+  const methodsById = new Map(methods.map((method) => [method.id, method]));
   const sdkVocabulary = buildSdkVocabulary(methods);
+  const ignorePatterns = (options.ignoreExtraMethods ?? []).flatMap((pattern) => {
+    try {
+      return [new RegExp(pattern)];
+    } catch {
+      return [];
+    }
+  });
+
+  function isIgnoredExtraMethod(method: SdkMethodSurface): boolean {
+    if (method.methodKind === "utility") return true;
+    const target = `${method.namespace}.${method.methodName} ${method.sourceFile ?? ""}`;
+    return ignorePatterns.some((pattern) => pattern.test(target));
+  }
 
   for (const match of matches) {
     const isHighConfidence = match.strategy === "exact" || match.strategy === "override" || match.confidence >= 0.75;
     if (!match.sdkMethodId) {
-      const operation = operations.find((op) => op.operationId === match.operationId);
+      const operation = operationsById.get(match.operationId);
       const resource = operation ? operationResourceToken(operation.path) : undefined;
       const resourceSupported = resource
         ? sdkVocabulary.has(resource.toLowerCase()) || sdkVocabulary.has(singularize(resource.toLowerCase()))
@@ -248,31 +273,48 @@ export function computeDiff(
       continue;
     }
 
-    const operation = operations.find((op) => op.operationId === match.operationId);
-    const method = methods.find((m) => m.id === match.sdkMethodId);
+    const operation = operationsById.get(match.operationId);
+    const method = methodsById.get(match.sdkMethodId);
     if (!operation || !method) continue;
     const dynamicParams = hasDynamicParamSupport(method);
-    if (usesParameterBag(method)) continue;
+    if (usesParameterBag(method)) {
+      findings.push({
+        id: `parambag_${operation.operationId}_${method.id}`,
+        category: "param_not_explicit",
+        severity: severityFor("param_not_explicit"),
+        confidence: confidenceForFinding("param_not_explicit", match, isHighConfidence),
+        operationId: operation.operationId,
+        sdkMethodId: method.id,
+        message: `Operation ${operation.operationId} matched to ${method.methodName} using a parameter bag; param-level verification skipped`,
+        remediation: remediationFor("param_not_explicit", isHighConfidence)
+      });
+      continue;
+    }
 
     const specParams = [...operation.pathParams, ...operation.queryParams];
     for (const specParam of specParams) {
       const sdkParam = findParam(method, specParam.name);
+      const hasUnknownParam = method.params.some((param) => param.in === "unknown");
       if (!sdkParam && specParam.required) {
+        const canDowngrade = dynamicParams || hasUnknownParam;
+        const category: DriftCategory = canDowngrade ? "param_not_explicit" : "required_field_added";
         findings.push({
           id: `required_${operation.operationId}_${specParam.name}`,
-          category: "required_field_added",
-          severity: severityFor("required_field_added"),
-          confidence: confidenceForFinding("required_field_added", match, isHighConfidence),
+          category,
+          severity: severityFor(category),
+          confidence: confidenceForFinding(category, match, isHighConfidence),
           operationId: operation.operationId,
           sdkMethodId: method.id,
-          message: `Required parameter ${specParam.name} is missing in SDK method ${method.methodName}`,
-          remediation: remediationFor("required_field_added", isHighConfidence)
+          message: canDowngrade
+            ? `Required parameter ${specParam.name} is not explicit in SDK signature for ${method.methodName}`
+            : `Required parameter ${specParam.name} is missing in SDK method ${method.methodName}`,
+          remediation: remediationFor(category, isHighConfidence)
         });
         continue;
       }
 
       if (!sdkParam) {
-        const category: DriftCategory = dynamicParams ? "param_not_explicit" : "changed_param";
+        const category: DriftCategory = dynamicParams || hasUnknownParam ? "param_not_explicit" : "changed_param";
         findings.push({
           id: `changed_${operation.operationId}_${specParam.name}`,
           category,
@@ -307,6 +349,7 @@ export function computeDiff(
 
   const matchedIds = new Set(matches.flatMap((m) => (m.sdkMethodId ? [m.sdkMethodId] : [])));
   for (const method of methods) {
+    if (isIgnoredExtraMethod(method)) continue;
     if (!matchedIds.has(method.id)) {
       findings.push({
         id: `extra_${method.id}`,

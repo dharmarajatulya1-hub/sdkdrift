@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "generatedAt": "2026-02-28",
+  "targets": [
+    {
+      "name": "ory-kratos-python",
+      "specRepo": "https://github.com/ory/sdk",
+      "sdkRepo": "https://github.com/ory/sdk",
+      "specCommit": "pinned-in-external-run",
+      "sdkCommit": "pinned-in-external-run",
+      "reportFile": "validation/real-world/ory-kratos-python.post3.json"
+    },
+    {
+      "name": "ory-kratos-ts",
+      "specRepo": "https://github.com/ory/sdk",
+      "sdkRepo": "https://github.com/ory/sdk",
+      "specCommit": "pinned-in-external-run",
+      "sdkCommit": "pinned-in-external-run",
+      "reportFile": "validation/real-world/ory-kratos-ts.post3.json"
+    },
+    {
+      "name": "stripe-python",
+      "specRepo": "https://github.com/stripe/openapi",
+      "sdkRepo": "https://github.com/stripe/stripe-python",
+      "specCommit": "pinned-in-external-run",
+      "sdkCommit": "pinned-in-external-run",
+      "reportFile": "validation/real-world/stripe-python.post3.json"
+    },
+    {
+      "name": "stripe-node-ts",
+      "specRepo": "https://github.com/stripe/openapi",
+      "sdkRepo": "https://github.com/stripe/stripe-node",
+      "specCommit": "pinned-in-external-run",
+      "sdkCommit": "pinned-in-external-run",
+      "reportFile": "validation/real-world/stripe-node-ts.post3.json"
+    }
+  ],
+  "gates": {
+    "minActionableScore": 30,
+    "maxRuntimeMultiplier": 1.8,
+    "maxActionableRegressionPercent": 5
+  }
+}

@@ -2,9 +2,10 @@
 import { Command } from "commander";
 import { readFile, writeFile } from "node:fs/promises";
 import { renderReport, scanWithArtifacts } from "@sdkdrift/core";
-import type { MatchOptions } from "@sdkdrift/core";
+import type { DiffOptions, MatchOptions } from "@sdkdrift/core";
 import { scanPythonSdk, scanTypeScriptSdk } from "@sdkdrift/python-scanner";
 import { load } from "js-yaml";
+import packageJson from "../package.json" with { type: "json" };
 
 type RawConfig = {
   mapping?: {
@@ -12,6 +13,15 @@ type RawConfig = {
   };
   match?: {
     heuristicThreshold?: number;
+    mode?: "precision" | "balanced" | "recall";
+    minConfidenceActionable?: number;
+    minTop2Margin?: number;
+    abstainOverGuess?: boolean;
+  };
+  diff?: {
+    ignore?: {
+      extraMethods?: string[];
+    };
   };
 };
 
@@ -28,11 +38,29 @@ function validateConfig(config: unknown, configPath: string): RawConfig {
   if (raw.match && !isRecord(raw.match)) {
     throw new Error(`Invalid config at ${configPath}: match must be an object`);
   }
+  if (typeof raw.match?.mode !== "undefined" && !["precision", "balanced", "recall"].includes(String(raw.match.mode))) {
+    throw new Error(`Invalid config at ${configPath}: match.mode must be one of precision|balanced|recall`);
+  }
   if (typeof raw.match?.heuristicThreshold !== "undefined") {
     const threshold = raw.match.heuristicThreshold;
     if (typeof threshold !== "number" || Number.isNaN(threshold) || threshold < 0 || threshold > 1) {
       throw new Error(`Invalid config at ${configPath}: match.heuristicThreshold must be a number between 0 and 1`);
     }
+  }
+  if (typeof raw.match?.minConfidenceActionable !== "undefined") {
+    const value = raw.match.minConfidenceActionable;
+    if (typeof value !== "number" || Number.isNaN(value) || value < 0 || value > 1) {
+      throw new Error(`Invalid config at ${configPath}: match.minConfidenceActionable must be a number between 0 and 1`);
+    }
+  }
+  if (typeof raw.match?.minTop2Margin !== "undefined") {
+    const value = raw.match.minTop2Margin;
+    if (typeof value !== "number" || Number.isNaN(value) || value < 0 || value > 1) {
+      throw new Error(`Invalid config at ${configPath}: match.minTop2Margin must be a number between 0 and 1`);
+    }
+  }
+  if (typeof raw.match?.abstainOverGuess !== "undefined" && typeof raw.match.abstainOverGuess !== "boolean") {
+    throw new Error(`Invalid config at ${configPath}: match.abstainOverGuess must be a boolean`);
   }
 
   if (raw.mapping && !isRecord(raw.mapping)) {
@@ -61,10 +89,38 @@ function validateConfig(config: unknown, configPath: string): RawConfig {
     seenOperationIds.add(operationId);
   }
 
+  if (typeof raw.diff !== "undefined" && !isRecord(raw.diff)) {
+    throw new Error(`Invalid config at ${configPath}: diff must be an object`);
+  }
+  if (typeof raw.diff?.ignore !== "undefined" && !isRecord(raw.diff.ignore)) {
+    throw new Error(`Invalid config at ${configPath}: diff.ignore must be an object`);
+  }
+  if (typeof raw.diff?.ignore?.extraMethods !== "undefined" && !Array.isArray(raw.diff.ignore.extraMethods)) {
+    throw new Error(`Invalid config at ${configPath}: diff.ignore.extraMethods must be an array`);
+  }
+  for (const [index, pattern] of (raw.diff?.ignore?.extraMethods ?? []).entries()) {
+    if (typeof pattern !== "string" || pattern.trim().length === 0) {
+      throw new Error(
+        `Invalid config at ${configPath}: diff.ignore.extraMethods[${index}] must be a non-empty string`
+      );
+    }
+    try {
+      // Validate regex syntax ahead of runtime to avoid silent misconfiguration.
+      // eslint-disable-next-line no-new
+      new RegExp(pattern);
+    } catch {
+      throw new Error(
+        `Invalid config at ${configPath}: diff.ignore.extraMethods[${index}] is not a valid regex pattern`
+      );
+    }
+  }
+
   return raw;
 }
 
-async function loadMatchOptions(configPath?: string): Promise<MatchOptions | undefined> {
+async function loadScanConfig(
+  configPath?: string
+): Promise<{ match?: MatchOptions; diff?: DiffOptions } | undefined> {
   if (!configPath) return undefined;
   const content = await readFile(configPath, "utf8");
   const parsed = load(content);
@@ -76,14 +132,36 @@ async function loadMatchOptions(configPath?: string): Promise<MatchOptions | und
     }
   }
 
-  const options: MatchOptions = {};
+  const matchOptions: MatchOptions = {};
   if (Object.keys(overrides).length > 0) {
-    options.overrides = overrides;
+    matchOptions.overrides = overrides;
   }
   if (typeof config.match?.heuristicThreshold === "number") {
-    options.heuristicThreshold = config.match.heuristicThreshold;
+    matchOptions.heuristicThreshold = config.match.heuristicThreshold;
   }
-  return Object.keys(options).length > 0 ? options : undefined;
+  if (typeof config.match?.mode === "string") {
+    matchOptions.mode = config.match.mode;
+  }
+  if (typeof config.match?.minConfidenceActionable === "number") {
+    matchOptions.minConfidenceActionable = config.match.minConfidenceActionable;
+  }
+  if (typeof config.match?.minTop2Margin === "number") {
+    matchOptions.minTop2Margin = config.match.minTop2Margin;
+  }
+  if (typeof config.match?.abstainOverGuess === "boolean") {
+    matchOptions.abstainOverGuess = config.match.abstainOverGuess;
+  }
+
+  const diffOptions: DiffOptions = {};
+  const extraMethodPatterns = config.diff?.ignore?.extraMethods;
+  if (Array.isArray(extraMethodPatterns) && extraMethodPatterns.length > 0) {
+    diffOptions.ignoreExtraMethods = extraMethodPatterns;
+  }
+
+  const output: { match?: MatchOptions; diff?: DiffOptions } = {};
+  if (Object.keys(matchOptions).length > 0) output.match = matchOptions;
+  if (Object.keys(diffOptions).length > 0) output.diff = diffOptions;
+  return Object.keys(output).length > 0 ? output : undefined;
 }
 
 async function run(): Promise<number> {
@@ -92,7 +170,7 @@ async function run(): Promise<number> {
   program
     .name("sdkdrift")
     .description("Detect drift between OpenAPI specs and SDK surfaces")
-    .version("0.1.0");
+    .version(packageJson.version);
 
   program
     .command("scan")
@@ -101,12 +179,13 @@ async function run(): Promise<number> {
     .requiredOption("--lang <python|ts>", "SDK language")
     .option("--format <terminal|json|markdown>", "Report output format", "terminal")
     .option("--verbose", "Print matcher diagnostics to stderr", false)
+    .option("--compat-v1", "Emit v1-compatible JSON shape when format=json", false)
     .option("--config <path>", "Path to sdkdrift.config.yaml")
     .option("--out <path>", "Write output to file path")
     .option("--min-score <number>", "Fail if score is below threshold", (v) => Number(v))
     .action(async (args) => {
       const lang = args.lang as "python" | "ts";
-      const matchOptions = await loadMatchOptions(args.config as string | undefined);
+      const scanConfig = await loadScanConfig(args.config as string | undefined);
       const methods =
         lang === "python" ? await scanPythonSdk(args.sdk as string) : await scanTypeScriptSdk(args.sdk as string);
 
@@ -116,7 +195,8 @@ async function run(): Promise<number> {
           sdkPath: args.sdk as string,
           language: lang,
           minScore: args.minScore as number | undefined,
-          match: matchOptions
+          match: scanConfig?.match,
+          diff: scanConfig?.diff
         },
         methods
       );
@@ -124,11 +204,15 @@ async function run(): Promise<number> {
 
       const format = (args.format as "terminal" | "json" | "markdown") ?? "terminal";
       const output = renderReport(report, format);
+      const outputValue =
+        Boolean(args.compatV1) && format === "json"
+          ? JSON.stringify(toV1Compat(report), null, 2)
+          : output;
 
       if (args.out) {
-        await writeFile(args.out as string, output, "utf8");
+        await writeFile(args.out as string, outputValue, "utf8");
       } else {
-        process.stdout.write(`${output}\n`);
+        process.stdout.write(`${outputValue}\n`);
       }
 
       if (Boolean(args.verbose)) {
@@ -156,6 +240,28 @@ async function run(): Promise<number> {
 
   await program.parseAsync(process.argv);
   return typeof process.exitCode === "number" ? process.exitCode : 0;
+}
+
+function toV1Compat(report: Awaited<ReturnType<typeof scanWithArtifacts>>["report"]) {
+  return {
+    version: "1",
+    score: report.score,
+    summary: {
+      operationsTotal: report.summary.operationsTotal,
+      operationsMatched: report.summary.operationsMatched,
+      findingsTotal: report.summary.findingsTotal
+    },
+    deductions: report.deductions,
+    findings: report.findings.map((finding) => ({
+      id: finding.id,
+      category: finding.category,
+      severity: finding.severity,
+      operationId: finding.operationId,
+      sdkMethodId: finding.sdkMethodId,
+      message: finding.message,
+      remediation: finding.remediation
+    }))
+  };
 }
 
 run().catch((error) => {

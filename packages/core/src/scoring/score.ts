@@ -15,7 +15,10 @@ export function scoreReport(
   findings: DriftFinding[],
   operationsTotal: number,
   operationsMatched: number
-): Pick<DriftReport, "score" | "deductions" | "weightedDeductions" | "summary"> {
+): Pick<
+  DriftReport,
+  "score" | "scores" | "deductions" | "weightedDeductions" | "categoryCounts" | "weightedImpact" | "summary"
+> {
   const counts: Partial<Record<DriftCategory, number>> = {};
   const weightedDeductions: Partial<Record<DriftCategory, number>> = {};
 
@@ -38,11 +41,35 @@ export function scoreReport(
   const normalizationFactor = Math.max(1, operationsTotal / 10);
   const normalizedDeduction = totalDeduction / normalizationFactor;
   const score = Math.max(0, Math.round(100 - normalizedDeduction));
+  const actionableCount = findings.filter((finding) =>
+    ["missing_endpoint", "changed_param", "required_field_added", "type_mismatch", "deprecated_mismatch"].includes(
+      finding.category
+    )
+  ).length;
+  const coverageCount = Math.max(0, findings.length - actionableCount);
+  const actionablePenalty = findings
+    .filter((finding) =>
+      ["missing_endpoint", "changed_param", "required_field_added", "type_mismatch", "deprecated_mismatch"].includes(
+        finding.category
+      )
+    )
+    .reduce((acc, finding) => acc + weights[finding.category], 0);
+  const coveragePenalty = findings
+    .filter((finding) => !["missing_endpoint", "changed_param", "required_field_added", "type_mismatch", "deprecated_mismatch"].includes(finding.category))
+    .reduce((acc, finding) => acc + weights[finding.category], 0);
+  const actionableScore = Math.max(0, Math.round(100 - actionablePenalty / normalizationFactor));
+  const coverageScore = Math.max(0, Math.round(100 - coveragePenalty / normalizationFactor));
 
   return {
     score,
+    scores: {
+      actionable: actionableCount ? actionableScore : 100,
+      coverage: coverageCount ? coverageScore : 100
+    },
     deductions: counts,
     weightedDeductions,
+    categoryCounts: counts,
+    weightedImpact: weightedDeductions,
     summary: {
       operationsTotal,
       operationsMatched,

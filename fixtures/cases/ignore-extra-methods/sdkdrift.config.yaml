@@ -1,0 +1,4 @@
+diff:
+  ignore:
+    extraMethods:
+      - "MiscApi\\.debug_trace"

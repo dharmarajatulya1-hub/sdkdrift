@@ -10,7 +10,7 @@ export function formatMarkdown(report: DriftReport): string {
         .join(", ")
     : "none";
 
-  const header = `# SDKDrift Report\n\n**Score:** ${report.score}/100\n`;
+  const header = `# SDKDrift Report\n\n**Score:** ${report.score}/100\n\n**Actionable score:** ${report.scores?.actionable ?? report.score}/100\n\n**Coverage score:** ${report.scores?.coverage ?? report.score}/100\n`;
   const summary = `\n| Metric | Value |\n|---|---|\n| Operations matched | ${report.summary.operationsMatched}/${report.summary.operationsTotal} |\n| Findings | ${report.summary.findingsTotal} |\n| Actionable findings | ${report.summary.actionableFindingsTotal ?? actionable.length} |\n| Coverage notes | ${report.summary.coverageNotesTotal ?? coverage.length} |\n| Unmatched reasons | ${unmatchedReasonText} |\n`;
   const findings = actionable
     .map((f) => `- **${f.severity}** \`${f.category}\`: ${f.message}`)

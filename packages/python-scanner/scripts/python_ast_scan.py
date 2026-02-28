@@ -123,6 +123,9 @@ def scan_file(path: str, root: str) -> List[Dict[str, Any]]:
                         "params": params,
                         "visibility": "public",
                         "sourceFile": path,
+                        "methodKind": "class_method",
+                        "scannerConfidence": 0.82,
+                        "provenance": {"strategy": "python-ast-class-method"},
                     })
 
     return methods

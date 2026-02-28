@@ -218,13 +218,16 @@ function classifyUnmatchedReason(
   usedMethodIds: Set<string>
 ): UnmatchedReason {
   const availableMethods = methods.filter((method) => !usedMethodIds.has(method.id));
+  if (availableMethods.every((method) => (method.scannerConfidence ?? 1) < 0.45)) {
+    return "scanner_low_evidence";
+  }
   const opResources = [...new Set(operationResourceTokens(operation).map(singularizeToken))];
   const resourceCandidates = availableMethods.filter((method) => {
     const methodResources = [...new Set(methodResourceTokens(method).map(singularizeToken))];
     return overlapScore(opResources, methodResources) > 0;
   });
 
-  if (resourceCandidates.length === 0) return "no_matching_resource_in_sdk";
+  if (resourceCandidates.length === 0) return "resource_missing";
 
   const opAction = inferOperationAction(operation);
   if (!opAction) return "low_confidence_unmatched";
@@ -234,7 +237,7 @@ function classifyUnmatchedReason(
     return methodAction === opAction;
   });
 
-  if (actionCandidates.length === 0) return "no_matching_action_in_resource";
+  if (actionCandidates.length === 0) return "action_missing";
   return "path_based_match_available";
 }
 
@@ -301,7 +304,16 @@ export function matchOperations(
   methods: SdkMethodSurface[],
   options: MatchOptions = {}
 ): MatchResult[] {
-  const threshold = options.heuristicThreshold ?? 0.45;
+  const mode = options.mode ?? "precision";
+  const thresholdByMode: Record<"precision" | "balanced" | "recall", number> = {
+    precision: 0.58,
+    balanced: 0.5,
+    recall: 0.4
+  };
+  const threshold = options.heuristicThreshold ?? thresholdByMode[mode];
+  const minConfidenceActionable = options.minConfidenceActionable ?? (mode === "precision" ? 0.7 : 0.55);
+  const minTop2Margin = options.minTop2Margin ?? (mode === "precision" ? 0.08 : 0.04);
+  const abstainOverGuess = options.abstainOverGuess ?? mode === "precision";
   const overrides = options.overrides ?? {};
   const usedMethodIds = new Set<string>();
 
@@ -319,7 +331,8 @@ export function matchOperations(
           operationId: operation.operationId,
           sdkMethodId: overrideMethod.id,
           confidence: 1,
-          strategy: "override"
+          strategy: "override",
+          evidence: { mode, minConfidenceActionable, minTop2Margin }
         };
       }
     }
@@ -337,28 +350,47 @@ export function matchOperations(
         operationId: operation.operationId,
         sdkMethodId: direct.id,
         confidence: 1,
-        strategy: "exact"
+        strategy: "exact",
+        evidence: { mode, minConfidenceActionable, minTop2Margin }
       };
     }
 
     let best: SdkMethodSurface | undefined;
     let bestScore = 0;
+    let secondBestScore = 0;
+    const rankedCandidates: Array<{ sdkMethodId: string; confidence: number }> = [];
     for (const method of methods) {
       if (usedMethodIds.has(method.id)) continue;
       const score = candidateScore(operation, method);
+      rankedCandidates.push({ sdkMethodId: method.id, confidence: Number(score.toFixed(3)) });
       if (score > bestScore) {
+        secondBestScore = bestScore;
         bestScore = score;
         best = method;
+      } else if (score > secondBestScore) {
+        secondBestScore = score;
       }
     }
+    rankedCandidates.sort((a, b) => b.confidence - a.confidence);
+    const topCandidates = rankedCandidates.slice(0, 3);
+    const topMargin = Math.max(0, bestScore - secondBestScore);
+    const ambiguousTopCandidates = topMargin < minTop2Margin && secondBestScore >= threshold;
 
-    if (best && bestScore >= threshold) {
+    if (best && bestScore >= threshold && (!abstainOverGuess || (!ambiguousTopCandidates && bestScore >= minConfidenceActionable))) {
       usedMethodIds.add(best.id);
       return {
         operationId: operation.operationId,
         sdkMethodId: best.id,
         confidence: Number(bestScore.toFixed(3)),
-        strategy: "heuristic"
+        strategy: "heuristic",
+        candidates: topCandidates,
+        evidence: {
+          mode,
+          threshold,
+          minConfidenceActionable,
+          minTop2Margin,
+          topMargin: Number(topMargin.toFixed(3))
+        }
       };
     }
 
@@ -379,7 +411,15 @@ export function matchOperations(
         operationId: operation.operationId,
         sdkMethodId: fallbackBest.id,
         confidence: Number(fallbackBestScore.toFixed(3)),
-        strategy: "path_fallback"
+        strategy: "path_fallback",
+        candidates: topCandidates,
+        evidence: {
+          mode,
+          threshold,
+          minConfidenceActionable,
+          minTop2Margin,
+          topMargin: Number(topMargin.toFixed(3))
+        }
       };
     }
 
@@ -387,7 +427,17 @@ export function matchOperations(
       operationId: operation.operationId,
       confidence: 0,
       strategy: "unmatched",
-      unmatchedReason: classifyUnmatchedReason(operation, methods, usedMethodIds)
+      unmatchedReason: ambiguousTopCandidates
+        ? "ambiguous_top_candidates"
+        : classifyUnmatchedReason(operation, methods, usedMethodIds),
+      candidates: topCandidates,
+      evidence: {
+        mode,
+        threshold,
+        minConfidenceActionable,
+        minTop2Margin,
+        topMargin: Number(topMargin.toFixed(3))
+      }
     };
   });
 }

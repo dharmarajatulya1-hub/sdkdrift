@@ -8,14 +8,17 @@ type OpenApiParameter = {
   schema?: Record<string, unknown>;
 };
 
-function fromSchema(schema: Record<string, unknown> | undefined): TypeSurface | undefined {
+function fromSchema(
+  schema: Record<string, unknown> | undefined,
+  contentType?: string
+): TypeSurface | undefined {
   if (!schema) return undefined;
   if (typeof schema.$ref === "string") {
     const parts = schema.$ref.split("/");
-    return { name: parts[parts.length - 1] ?? "unknown", raw: schema.$ref };
+    return { name: parts[parts.length - 1] ?? "unknown", raw: schema.$ref, contentType };
   }
   if (typeof schema.type === "string") {
-    return { name: schema.type, nullable: Boolean(schema.nullable) };
+    return { name: schema.type, nullable: Boolean(schema.nullable), contentType };
   }
   return undefined;
 }
@@ -37,20 +40,46 @@ function parseParameters(parameters: unknown[]): ParameterSurface[] {
   return output;
 }
 
+function preferredResponseEntry(
+  rawResponses: Record<string, unknown> | undefined
+): [string, unknown] | undefined {
+  if (!rawResponses) return undefined;
+  const entries = Object.entries(rawResponses);
+  if (!entries.length) return undefined;
+
+  const direct = ["200", "201", "204"].find((status) => status in rawResponses);
+  if (direct) return [direct, rawResponses[direct]];
+
+  const twoXX = entries.find(([status]) => /^[2]..$/.test(status));
+  if (twoXX) return twoXX;
+
+  return entries[0];
+}
+
+function preferredContentType(
+  content: Record<string, { schema?: Record<string, unknown> }> | undefined
+): [string, { schema?: Record<string, unknown> }] | undefined {
+  if (!content) return undefined;
+  if (content["application/json"]) return ["application/json", content["application/json"]];
+  const entries = Object.entries(content);
+  return entries[0];
+}
+
 function parseResponses(rawResponses: Record<string, unknown> | undefined): ResponseSurface[] {
   if (!rawResponses) return [];
-  const responses: ResponseSurface[] = [];
-  for (const [statusCode, raw] of Object.entries(rawResponses)) {
-    const response = (raw ?? {}) as {
-      content?: Record<string, { schema?: Record<string, unknown> }>;
-    };
-    const firstContent = response.content ? Object.values(response.content)[0] : undefined;
-    responses.push({
+  const selected = preferredResponseEntry(rawResponses);
+  if (!selected) return [];
+  const [statusCode, raw] = selected;
+  const response = (raw ?? {}) as {
+    content?: Record<string, { schema?: Record<string, unknown> }>;
+  };
+  const content = preferredContentType(response.content);
+  return [
+    {
       statusCode,
-      type: fromSchema(firstContent?.schema)
-    });
-  }
-  return responses;
+      type: fromSchema(content?.[1]?.schema, content?.[0])
+    }
+  ];
 }
 
 export async function parseOpenApi(specPathOrUrl: string): Promise<OperationSurface[]> {
@@ -74,7 +103,7 @@ export async function parseOpenApi(specPathOrUrl: string): Promise<OperationSurf
       const operationId = typeof op.operationId === "string" ? op.operationId : `${m}_${path}`;
       const opParams = parseParameters(Array.isArray(op.parameters) ? op.parameters : []);
       const allParams = [...pathLevelParams, ...opParams];
-      const requestBodyContent = op.requestBody?.content ? Object.values(op.requestBody.content)[0] : undefined;
+      const requestBodyContent = preferredContentType(op.requestBody?.content);
 
       results.push({
         operationId,
@@ -82,7 +111,7 @@ export async function parseOpenApi(specPathOrUrl: string): Promise<OperationSurf
         path,
         pathParams: allParams.filter((p) => p.in === "path"),
         queryParams: allParams.filter((p) => p.in === "query"),
-        requestBody: fromSchema(requestBodyContent?.schema),
+        requestBody: fromSchema(requestBodyContent?.[1]?.schema, requestBodyContent?.[0]),
         responses: parseResponses(op.responses),
         deprecated: Boolean(op.deprecated)
       });

@@ -88,13 +88,37 @@ export async function scanTypeScriptSdk(_sdkPath: string): Promise<SdkMethodSurf
     output.push(surface);
   }
 
-  function buildParamsFromCallable(callable: { getParameters(): Array<{ getName(): string; isOptional(): boolean; getType(): { getText(node: unknown): string } }> }, nodeForType: unknown) {
-    return callable.getParameters().map((param) => ({
-      name: param.getName(),
-      in: "query" as const,
-      required: !param.isOptional(),
-      type: { name: param.getType().getText(nodeForType) }
-    }));
+  function parsePathParamNames(pathTemplate?: string): Set<string> {
+    const names = new Set<string>();
+    if (!pathTemplate) return names;
+    const matcher = /\{([^}]+)\}/g;
+    let match = matcher.exec(pathTemplate);
+    while (match) {
+      const rawName = (match[1] ?? "").trim();
+      if (rawName) names.add(rawName);
+      match = matcher.exec(pathTemplate);
+    }
+    return names;
+  }
+
+  function buildParamsFromCallable(
+    callable: {
+      getParameters(): Array<{ getName(): string; isOptional(): boolean; getType(): { getText(node: unknown): string } }>;
+    },
+    nodeForType: unknown,
+    pathTemplate?: string
+  ) {
+    const pathParamNames = parsePathParamNames(pathTemplate);
+    return callable.getParameters().map((param) => {
+      const name = param.getName();
+      const location = pathParamNames.has(name) ? "path" : "unknown";
+      return {
+        name,
+        in: location as "path" | "unknown",
+        required: !param.isOptional(),
+        type: { name: param.getType().getText(nodeForType) }
+      };
+    });
   }
 
   function parsePathParams(pathTemplate: string): Array<{ name: string; in: "path"; required: true; type: { name: string } }> {
@@ -201,7 +225,10 @@ export async function scanTypeScriptSdk(_sdkPath: string): Promise<SdkMethodSurf
             params: buildParamsFromCallable(property, property),
             returnType: { name: property.getReturnType().getText(property) },
             visibility: "public",
-            sourceFile: filePath
+            sourceFile: filePath,
+            methodKind: "extend_method",
+            scannerConfidence: 0.82,
+            provenance: { strategy: "extend-method" }
           });
           continue;
         }
@@ -221,7 +248,10 @@ export async function scanTypeScriptSdk(_sdkPath: string): Promise<SdkMethodSurf
             params: buildParamsFromCallable(assignedValue, assignedValue),
             returnType: { name: assignedValue.getReturnType().getText(assignedValue) },
             visibility: "public",
-            sourceFile: filePath
+            sourceFile: filePath,
+            methodKind: "extend_method",
+            scannerConfidence: 0.78,
+            provenance: { strategy: "extend-assignment" }
           });
           continue;
         }
@@ -239,10 +269,21 @@ export async function scanTypeScriptSdk(_sdkPath: string): Promise<SdkMethodSurf
           params,
           returnType: { name: assignedValue.getType().getText(assignedValue) },
           visibility: "public",
-          sourceFile: filePath
+          sourceFile: filePath,
+          methodKind: "factory",
+          scannerConfidence: 0.92,
+          provenance: { strategy: "method-factory", pathTemplate: specPath }
         });
       }
     }
+  }
+
+  function isUtilityMethod(filePath: string, methodName: string, namespace: string): boolean {
+    const normalized = `${namespace}.${methodName}`.toLowerCase();
+    if (wrapperMethods.has(methodName)) return true;
+    if (normalized.includes("paginate") || normalized.includes("iterator")) return true;
+    if (/(^|\/)(utils?|internal|helpers?)\//.test(filePath.toLowerCase())) return true;
+    return false;
   }
 
   for (const sourceFile of project.getSourceFiles()) {
@@ -264,7 +305,10 @@ export async function scanTypeScriptSdk(_sdkPath: string): Promise<SdkMethodSurf
           params: buildParamsFromCallable(method, method),
           returnType: { name: method.getReturnType().getText(method) },
           visibility: "public",
-          sourceFile: filePath
+          sourceFile: filePath,
+          methodKind: isUtilityMethod(filePath, methodName, namespace) ? "utility" : "class_method",
+          scannerConfidence: 0.86,
+          provenance: { strategy: "class-method" }
         });
       }
     }
@@ -284,7 +328,10 @@ export async function scanTypeScriptSdk(_sdkPath: string): Promise<SdkMethodSurf
         params: buildParamsFromCallable(fn, fn),
         returnType: { name: fn.getReturnType().getText(fn) },
         visibility: "public",
-        sourceFile: filePath
+        sourceFile: filePath,
+        methodKind: isUtilityMethod(filePath, methodName, namespace) ? "utility" : "function",
+        scannerConfidence: 0.8,
+        provenance: { strategy: "function-export" }
       });
     }
 

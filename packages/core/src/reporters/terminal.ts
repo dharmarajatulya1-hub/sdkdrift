@@ -13,6 +13,8 @@ export function formatTerminal(report: DriftReport): string {
   const lines = [
     `SDKDrift Report`,
     `Score: ${report.score}/100`,
+    `Actionable score: ${report.scores?.actionable ?? report.score}/100`,
+    `Coverage score: ${report.scores?.coverage ?? report.score}/100`,
     `Operations: ${report.summary.operationsMatched}/${report.summary.operationsTotal} matched`,
     `Findings: ${report.summary.findingsTotal}`,
     `Actionable: ${report.summary.actionableFindingsTotal ?? actionable.length}`,

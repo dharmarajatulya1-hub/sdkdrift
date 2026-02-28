@@ -4,11 +4,12 @@ export interface TypeSurface {
   name: string;
   nullable?: boolean;
   raw?: string;
+  contentType?: string;
 }
 
 export interface ParameterSurface {
   name: string;
-  in: "path" | "query" | "header" | "cookie" | "body";
+  in: "path" | "query" | "header" | "cookie" | "body" | "unknown";
   required: boolean;
   type?: TypeSurface;
 }
@@ -38,6 +39,12 @@ export interface SdkMethodSurface {
   visibility: "public" | "private";
   sourceFile?: string;
   deprecated?: boolean;
+  methodKind?: "class_method" | "function" | "factory" | "extend_method" | "utility";
+  scannerConfidence?: number;
+  provenance?: {
+    strategy?: string;
+    pathTemplate?: string;
+  };
 }
 
 export type DriftCategory =
@@ -54,7 +61,10 @@ export interface DriftFinding {
   id: string;
   category: DriftCategory;
   severity: "critical" | "high" | "medium" | "low";
+  ruleId?: string;
   confidence?: number;
+  isActionable?: boolean;
+  evidence?: Record<string, unknown>;
   operationId?: string;
   sdkMethodId?: string;
   message: string;
@@ -64,6 +74,10 @@ export interface DriftFinding {
 export interface DriftReport {
   version: string;
   score: number;
+  scores?: {
+    actionable: number;
+    coverage: number;
+  };
   summary: {
     operationsTotal: number;
     operationsMatched: number;
@@ -74,6 +88,8 @@ export interface DriftReport {
   };
   deductions: Partial<Record<DriftCategory, number>>;
   weightedDeductions?: Partial<Record<DriftCategory, number>>;
+  categoryCounts?: Partial<Record<DriftCategory, number>>;
+  weightedImpact?: Partial<Record<DriftCategory, number>>;
   findings: DriftFinding[];
   actionableFindings?: DriftFinding[];
   coverageNotes?: DriftFinding[];
@@ -83,12 +99,18 @@ export type UnmatchedReason =
   | "no_matching_resource_in_sdk"
   | "no_matching_action_in_resource"
   | "path_based_match_available"
-  | "low_confidence_unmatched";
+  | "low_confidence_unmatched"
+  | "ambiguous_top_candidates"
+  | "scanner_low_evidence"
+  | "resource_missing"
+  | "action_missing";
 
 export interface MatchResult {
   operationId: string;
   sdkMethodId?: string;
   confidence: number;
+  evidence?: Record<string, unknown>;
+  candidates?: Array<{ sdkMethodId: string; confidence: number }>;
   strategy: "exact" | "heuristic" | "override" | "path_fallback" | "unmatched";
   unmatchedReason?: UnmatchedReason;
 }
@@ -96,6 +118,14 @@ export interface MatchResult {
 export interface MatchOptions {
   overrides?: Record<string, string>;
   heuristicThreshold?: number;
+  mode?: "precision" | "balanced" | "recall";
+  minConfidenceActionable?: number;
+  minTop2Margin?: number;
+  abstainOverGuess?: boolean;
+}
+
+export interface DiffOptions {
+  ignoreExtraMethods?: string[];
 }
 
 export interface ScanOptions {
@@ -104,4 +134,5 @@ export interface ScanOptions {
   language: "python" | "ts";
   minScore?: number;
   match?: MatchOptions;
+  diff?: DiffOptions;
 }
