@@ -121,12 +121,16 @@ export function evaluateGoldDataset({ reportsByTarget, goldDataset, includeBoots
   const ece = calculateEce(calibrationSamples, 10);
   const brier = calculateBrier(calibrationSamples);
 
-  const reviewedRecords = records.filter((record) => record.reviewStatus === "reviewed").length;
+  const reviewedHumanRecords = records.filter((record) => record.reviewStatus === "reviewed").length;
+  const reviewedAutoRecords = records.filter((record) => record.reviewStatus === "reviewed_auto").length;
+  const reviewedRecords = reviewedHumanRecords + reviewedAutoRecords;
   const bootstrapRecords = records.filter((record) => record.reviewStatus === "bootstrap").length;
 
   return {
     version: 1,
     recordsEvaluated: records.length,
+    reviewedHumanRecords,
+    reviewedAutoRecords,
     reviewedRecords,
     bootstrapRecords,
     metrics: {

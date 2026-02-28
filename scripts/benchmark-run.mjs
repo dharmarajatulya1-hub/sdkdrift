@@ -85,6 +85,16 @@ async function main() {
     failures.push(`reviewed gold records ${goldEval.reviewedRecords} below minimum ${minReviewedGoldRecords}`);
   }
 
+  const minReviewedRecordsTotal = gates.minReviewedRecordsTotal ?? 0;
+  if (goldEval.reviewedRecords < minReviewedRecordsTotal) {
+    failures.push(`total reviewed records ${goldEval.reviewedRecords} below minimum ${minReviewedRecordsTotal}`);
+  }
+
+  const minHumanReviewedRecords = gates.minHumanReviewedRecords ?? 0;
+  if (goldEval.reviewedHumanRecords < minHumanReviewedRecords) {
+    failures.push(`human reviewed records ${goldEval.reviewedHumanRecords} below minimum ${minHumanReviewedRecords}`);
+  }
+
   const maxCalibrationEce = gates.maxCalibrationEce ?? 1;
   if (goldEval.metrics.calibrationEce > maxCalibrationEce) {
     failures.push(`calibration ECE ${goldEval.metrics.calibrationEce} exceeds ${maxCalibrationEce}`);

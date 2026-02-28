@@ -41,8 +41,10 @@
   },
   "gates": {
     "minActionableScore": 30,
-    "minGoldRecords": 120,
+    "minGoldRecords": 400,
     "minReviewedGoldRecords": 20,
+    "minReviewedRecordsTotal": 150,
+    "minHumanReviewedRecords": 20,
     "maxCalibrationEce": 0.25,
     "maxCalibrationBrier": 0.2,
     "maxRuntimeMultiplier": 1.8,

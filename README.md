@@ -189,6 +189,8 @@ Supported action inputs:
 ## Benchmark and Calibration
 
 - `npm run benchmark:run`: evaluates pinned real-world reports plus gold labels.
+- `npm run benchmark:gold:sync`: syncs benchmark findings into the gold dataset.
+- `npm run benchmark:gold:promote`: promotes bootstrap records to `reviewed_auto` for calibration coverage.
 - Gold labels file: `benchmark/gold/labeled-operations.v1.json`
 - Manifest and gates: `benchmark.manifest.json`
 
@@ -208,6 +210,7 @@ Supported action inputs:
 - `CONFIG_SPEC.md`: config contract
 - `MIGRATION_V2.md`: v2 rollout and compatibility mode
 - `SCORE_MODEL_V2.md`: scoring model details
+- `BENCHMARK_GOLD_WORKFLOW.md`: gold-label lifecycle and calibration workflow
 - `VALIDATION_REPORT.md`: latest validation summary
 - `RELEASE.md`: release and publish guide
 - `RELEASE_NOTES_v0.2.0.md`: release notes
