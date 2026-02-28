@@ -1,0 +1,6 @@
+match:
+  mode: precision
+  heuristicThreshold: 0.05
+  minConfidenceActionable: 0.05
+  minTop2Margin: 0.8
+  abstainOverGuess: true

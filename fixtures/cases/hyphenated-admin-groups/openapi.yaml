@@ -1,0 +1,11 @@
+openapi: 3.0.3
+info:
+  title: Hyphenated Admin Groups
+  version: 1.0.0
+paths:
+  /org-admin/projects:
+    get:
+      operationId: list-project-members
+      responses:
+        "200":
+          description: ok

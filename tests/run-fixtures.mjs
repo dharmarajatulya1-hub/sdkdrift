@@ -12,6 +12,7 @@ function runCase({
   expectedCategories = [],
   expectedScore,
   expectedVersion = "2",
+  expectedUnmatchedReason,
   minScore,
   expectExitCode,
   compatV1 = false
@@ -63,6 +64,10 @@ function runCase({
   const categories = report.findings.map((f) => f.category);
   for (const category of expectedCategories) {
     assert.ok(categories.includes(category), `${name}: missing category ${category}`);
+  }
+  if (expectedUnmatchedReason) {
+    const reasons = report.summary?.unmatchedReasons ?? {};
+    assert.ok(reasons[expectedUnmatchedReason] > 0, `${name}: expected unmatched reason ${expectedUnmatchedReason}`);
   }
 
   console.log(`PASS ${name}: score=${report.score} findings=${report.findings.length}`);
@@ -272,6 +277,32 @@ runCase({
   sdk: "./fixtures/cases/request-body-required/sdk/python",
   lang: "python",
   expectedCategories: ["required_field_added"]
+});
+
+runCase({
+  name: "ambiguous-top-candidates",
+  spec: "./fixtures/cases/ambiguous-top-candidates/openapi.yaml",
+  sdk: "./fixtures/cases/ambiguous-top-candidates/sdk/python",
+  lang: "python",
+  config: "./fixtures/cases/ambiguous-top-candidates/sdkdrift.config.yaml",
+  expectedCategories: ["missing_endpoint"],
+  expectedUnmatchedReason: "ambiguous_top_candidates"
+});
+
+runCase({
+  name: "hyphenated-admin-groups",
+  spec: "./fixtures/cases/hyphenated-admin-groups/openapi.yaml",
+  sdk: "./fixtures/cases/hyphenated-admin-groups/sdk/python",
+  lang: "python",
+  expectedScore: 100
+});
+
+runCase({
+  name: "utility-noise",
+  spec: "./fixtures/cases/utility-noise/openapi.yaml",
+  sdk: "./fixtures/cases/utility-noise/sdk/ts",
+  lang: "ts",
+  expectedScore: 100
 });
 
 console.log("All fixture tests passed.");
