@@ -315,129 +315,228 @@ export function matchOperations(
   const minTop2Margin = options.minTop2Margin ?? (mode === "precision" ? 0.08 : 0.04);
   const abstainOverGuess = options.abstainOverGuess ?? mode === "precision";
   const overrides = options.overrides ?? {};
-  const usedMethodIds = new Set<string>();
+  const fixedMatches = new Map<string, MatchResult>();
+  const lockedMethodIds = new Set<string>();
 
-  return operations.map((operation) => {
+  for (const operation of operations) {
     const overrideMethodId = overrides[operation.operationId];
-    if (overrideMethodId) {
-      const overrideMethod =
-        methods.find((m) => !usedMethodIds.has(m.id) && m.id === overrideMethodId) ??
-        methods.find(
-          (m) => !usedMethodIds.has(m.id) && `${m.namespace}.${m.methodName}` === overrideMethodId
-        );
-      if (overrideMethod && !usedMethodIds.has(overrideMethod.id)) {
-        usedMethodIds.add(overrideMethod.id);
-        return {
-          operationId: operation.operationId,
-          sdkMethodId: overrideMethod.id,
-          confidence: 1,
-          strategy: "override",
-          evidence: { mode, minConfidenceActionable, minTop2Margin }
-        };
-      }
-    }
+    if (!overrideMethodId) continue;
+    const overrideMethod =
+      methods.find((m) => !lockedMethodIds.has(m.id) && m.id === overrideMethodId) ??
+      methods.find((m) => !lockedMethodIds.has(m.id) && `${m.namespace}.${m.methodName}` === overrideMethodId);
+    if (!overrideMethod) continue;
+    lockedMethodIds.add(overrideMethod.id);
+    fixedMatches.set(operation.operationId, {
+      operationId: operation.operationId,
+      sdkMethodId: overrideMethod.id,
+      confidence: 1,
+      strategy: "override",
+      evidence: { mode, minConfidenceActionable, minTop2Margin }
+    });
+  }
 
+  for (const operation of operations) {
+    if (fixedMatches.has(operation.operationId)) continue;
     const direct = methods.find(
       (method) =>
-        !usedMethodIds.has(method.id) &&
+        !lockedMethodIds.has(method.id) &&
         (normalize(method.methodName) === normalize(operation.operationId) ||
           normalize(`${method.namespace}${method.methodName}`) === normalize(operation.operationId))
     );
-
-    if (direct) {
-      usedMethodIds.add(direct.id);
-      return {
-        operationId: operation.operationId,
-        sdkMethodId: direct.id,
-        confidence: 1,
-        strategy: "exact",
-        evidence: { mode, minConfidenceActionable, minTop2Margin }
-      };
-    }
-
-    let best: SdkMethodSurface | undefined;
-    let bestScore = 0;
-    let secondBestScore = 0;
-    const rankedCandidates: Array<{ sdkMethodId: string; confidence: number }> = [];
-    for (const method of methods) {
-      if (usedMethodIds.has(method.id)) continue;
-      const score = candidateScore(operation, method);
-      rankedCandidates.push({ sdkMethodId: method.id, confidence: Number(score.toFixed(3)) });
-      if (score > bestScore) {
-        secondBestScore = bestScore;
-        bestScore = score;
-        best = method;
-      } else if (score > secondBestScore) {
-        secondBestScore = score;
-      }
-    }
-    rankedCandidates.sort((a, b) => b.confidence - a.confidence);
-    const topCandidates = rankedCandidates.slice(0, 3);
-    const topMargin = Math.max(0, bestScore - secondBestScore);
-    const ambiguousTopCandidates = topMargin < minTop2Margin && secondBestScore >= threshold;
-
-    if (best && bestScore >= threshold && (!abstainOverGuess || (!ambiguousTopCandidates && bestScore >= minConfidenceActionable))) {
-      usedMethodIds.add(best.id);
-      return {
-        operationId: operation.operationId,
-        sdkMethodId: best.id,
-        confidence: Number(bestScore.toFixed(3)),
-        strategy: "heuristic",
-        candidates: topCandidates,
-        evidence: {
-          mode,
-          threshold,
-          minConfidenceActionable,
-          minTop2Margin,
-          topMargin: Number(topMargin.toFixed(3))
-        }
-      };
-    }
-
-    let fallbackBest: SdkMethodSurface | undefined;
-    let fallbackBestScore = 0;
-    for (const method of methods) {
-      if (usedMethodIds.has(method.id)) continue;
-      const score = fallbackScore(operation, method);
-      if (score > fallbackBestScore) {
-        fallbackBestScore = score;
-        fallbackBest = method;
-      }
-    }
-
-    if (fallbackBest && fallbackBestScore >= 0.72) {
-      usedMethodIds.add(fallbackBest.id);
-      return {
-        operationId: operation.operationId,
-        sdkMethodId: fallbackBest.id,
-        confidence: Number(fallbackBestScore.toFixed(3)),
-        strategy: "path_fallback",
-        candidates: topCandidates,
-        evidence: {
-          mode,
-          threshold,
-          minConfidenceActionable,
-          minTop2Margin,
-          topMargin: Number(topMargin.toFixed(3))
-        }
-      };
-    }
-
-    return {
+    if (!direct) continue;
+    lockedMethodIds.add(direct.id);
+    fixedMatches.set(operation.operationId, {
       operationId: operation.operationId,
+      sdkMethodId: direct.id,
+      confidence: 1,
+      strategy: "exact",
+      evidence: { mode, minConfidenceActionable, minTop2Margin }
+    });
+  }
+
+  const remainingOperations = operations.filter((operation) => !fixedMatches.has(operation.operationId));
+  const remainingMethods = methods.filter((method) => !lockedMethodIds.has(method.id));
+  const methodIndex = new Map(remainingMethods.map((method, idx) => [method.id, idx]));
+
+  type CandidateDetails = {
+    operation: OperationSurface;
+    ranked: Array<{ sdkMethodId: string; confidence: number; strategy: "heuristic" | "path_fallback" }>;
+    topCandidates: Array<{ sdkMethodId: string; confidence: number }>;
+    topMargin: number;
+    ambiguousTopCandidates: boolean;
+  };
+
+  const candidateDetails: CandidateDetails[] = remainingOperations.map((operation) => {
+    const ranked = remainingMethods
+      .map((method) => {
+        const heuristic = candidateScore(operation, method);
+        const fallback = fallbackScore(operation, method);
+        if (fallback >= heuristic && fallback >= 0.72) {
+          return {
+            sdkMethodId: method.id,
+            confidence: Number(fallback.toFixed(3)),
+            strategy: "path_fallback" as const
+          };
+        }
+        return {
+          sdkMethodId: method.id,
+          confidence: Number(heuristic.toFixed(3)),
+          strategy: "heuristic" as const
+        };
+      })
+      .sort((a, b) => b.confidence - a.confidence);
+
+    const first = ranked[0]?.confidence ?? 0;
+    const second = ranked[1]?.confidence ?? 0;
+    const topMargin = Math.max(0, first - second);
+    const ambiguousTopCandidates = topMargin < minTop2Margin && second >= threshold;
+    return {
+      operation,
+      ranked,
+      topCandidates: ranked.slice(0, 3).map(({ sdkMethodId, confidence }) => ({ sdkMethodId, confidence })),
+      topMargin,
+      ambiguousTopCandidates
+    };
+  });
+
+  function isEligible(confidence: number, strategy: "heuristic" | "path_fallback"): boolean {
+    if (strategy === "path_fallback") return confidence >= 0.72;
+    return confidence >= threshold;
+  }
+
+  function hungarianMax(matrix: number[][]): number[] {
+    const n = matrix.length;
+    const m = n > 0 ? matrix[0].length : 0;
+    if (n === 0 || m === 0) return Array(n).fill(-1);
+    const width = Math.max(n, m);
+    const maxValue = matrix.reduce((acc, row) => Math.max(acc, ...row), 0);
+    const a: number[][] = Array.from({ length: n + 1 }, (_, i) =>
+      Array.from({ length: width + 1 }, (_, j) => {
+        if (i === 0 || j === 0) return 0;
+        const weight = j <= m ? matrix[i - 1]?.[j - 1] ?? 0 : 0;
+        return maxValue - weight;
+      })
+    );
+    const u = new Array(n + 1).fill(0);
+    const v = new Array(width + 1).fill(0);
+    const p = new Array(width + 1).fill(0);
+    const way = new Array(width + 1).fill(0);
+
+    for (let i = 1; i <= n; i += 1) {
+      p[0] = i;
+      let j0 = 0;
+      const minv = new Array(width + 1).fill(Number.POSITIVE_INFINITY);
+      const used = new Array(width + 1).fill(false);
+      do {
+        used[j0] = true;
+        const i0 = p[j0];
+        let delta = Number.POSITIVE_INFINITY;
+        let j1 = 0;
+        for (let j = 1; j <= width; j += 1) {
+          if (used[j]) continue;
+          const cur = a[i0][j] - u[i0] - v[j];
+          if (cur < minv[j]) {
+            minv[j] = cur;
+            way[j] = j0;
+          }
+          if (minv[j] < delta) {
+            delta = minv[j];
+            j1 = j;
+          }
+        }
+        for (let j = 0; j <= width; j += 1) {
+          if (used[j]) {
+            u[p[j]] += delta;
+            v[j] -= delta;
+          } else {
+            minv[j] -= delta;
+          }
+        }
+        j0 = j1;
+      } while (p[j0] !== 0);
+      do {
+        const j1 = way[j0];
+        p[j0] = p[j1];
+        j0 = j1;
+      } while (j0 !== 0);
+    }
+
+    const assignment = Array(n).fill(-1);
+    for (let j = 1; j <= width; j += 1) {
+      const i = p[j];
+      if (i > 0 && i <= n && j <= m) {
+        assignment[i - 1] = j - 1;
+      }
+    }
+    return assignment;
+  }
+
+  const matrix = candidateDetails.map((detail) => {
+    const row = new Array(remainingMethods.length).fill(0);
+    for (const candidate of detail.ranked) {
+      const idx = methodIndex.get(candidate.sdkMethodId);
+      if (typeof idx !== "number") continue;
+      row[idx] = isEligible(candidate.confidence, candidate.strategy) ? candidate.confidence : 0;
+    }
+    return row;
+  });
+  const assignment = hungarianMax(matrix);
+  const selectedMethodIds = new Set(lockedMethodIds);
+  const byOperation = new Map<string, MatchResult>(fixedMatches);
+
+  for (let opIdx = 0; opIdx < candidateDetails.length; opIdx += 1) {
+    const detail = candidateDetails[opIdx];
+    const methodIdx = assignment[opIdx] ?? -1;
+    const candidate =
+      methodIdx >= 0
+        ? detail.ranked.find((item) => methodIndex.get(item.sdkMethodId) === methodIdx)
+        : undefined;
+    const evidence = {
+      mode,
+      threshold,
+      minConfidenceActionable,
+      minTop2Margin,
+      topMargin: Number(detail.topMargin.toFixed(3))
+    };
+
+    if (
+      candidate &&
+      isEligible(candidate.confidence, candidate.strategy) &&
+      (!abstainOverGuess || (!detail.ambiguousTopCandidates && candidate.confidence >= minConfidenceActionable))
+    ) {
+      selectedMethodIds.add(candidate.sdkMethodId);
+      byOperation.set(detail.operation.operationId, {
+        operationId: detail.operation.operationId,
+        sdkMethodId: candidate.sdkMethodId,
+        confidence: candidate.confidence,
+        strategy: candidate.strategy,
+        candidates: detail.topCandidates,
+        evidence
+      });
+      continue;
+    }
+
+    byOperation.set(detail.operation.operationId, {
+      operationId: detail.operation.operationId,
       confidence: 0,
       strategy: "unmatched",
-      unmatchedReason: ambiguousTopCandidates
+      unmatchedReason: detail.ambiguousTopCandidates
         ? "ambiguous_top_candidates"
-        : classifyUnmatchedReason(operation, methods, usedMethodIds),
-      candidates: topCandidates,
-      evidence: {
-        mode,
-        threshold,
-        minConfidenceActionable,
-        minTop2Margin,
-        topMargin: Number(topMargin.toFixed(3))
+        : classifyUnmatchedReason(detail.operation, methods, selectedMethodIds),
+      candidates: detail.topCandidates,
+      evidence
+    });
+  }
+
+  return operations.map((operation) => {
+    return (
+      byOperation.get(operation.operationId) ?? {
+        operationId: operation.operationId,
+        confidence: 0,
+        strategy: "unmatched",
+        unmatchedReason: classifyUnmatchedReason(operation, methods, selectedMethodIds),
+        evidence: { mode, threshold, minConfidenceActionable, minTop2Margin }
       }
-    };
+    );
   });
 }

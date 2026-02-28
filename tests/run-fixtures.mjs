@@ -266,4 +266,12 @@ runCase({
   compatV1: true
 });
 
+runCase({
+  name: "request-body-required",
+  spec: "./fixtures/cases/request-body-required/openapi.yaml",
+  sdk: "./fixtures/cases/request-body-required/sdk/python",
+  lang: "python",
+  expectedCategories: ["required_field_added"]
+});
+
 console.log("All fixture tests passed.");

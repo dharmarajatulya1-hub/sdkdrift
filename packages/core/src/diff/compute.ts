@@ -101,6 +101,63 @@ function normalizeType(value?: string): string {
   return aliases[alnum] ?? alnum;
 }
 
+function splitTopLevelUnion(value: string): string[] {
+  const output: string[] = [];
+  let current = "";
+  let depth = 0;
+  for (const ch of value) {
+    if (ch === "[" || ch === "<" || ch === "(") depth += 1;
+    if (ch === "]" || ch === ">" || ch === ")") depth = Math.max(0, depth - 1);
+    if (ch === "|" && depth === 0) {
+      if (current.trim()) output.push(current.trim());
+      current = "";
+      continue;
+    }
+    current += ch;
+  }
+  if (current.trim()) output.push(current.trim());
+  return output.length ? output : [value];
+}
+
+function canonicalAtomicType(raw: string): string {
+  const n = normalizeType(raw);
+  if (n === "int" || n === "integer" || n === "float" || n === "double" || n === "decimal") return "number";
+  if (n.includes("[]")) return "array";
+  if (n === "any" || n === "unknown") return "unknown";
+  return n;
+}
+
+function canonicalTypeSet(value?: string): Set<string> {
+  if (!value) return new Set(["unknown"]);
+  let v = value.toLowerCase().trim();
+  v = v.replace(/\s+/g, "");
+  const literalMatch = v.match(/literal\[(.+?)\]/);
+  if (literalMatch?.[1]) {
+    return new Set([inferLiteralType(literalMatch[1]) ?? "string"]);
+  }
+  v = v.replace(/^optional\[(.+)\]$/, "$1|null");
+  v = v.replace(/^union\[(.+)\]$/, "$1");
+  const members = splitTopLevelUnion(v);
+  const out = new Set<string>();
+  for (const member of members) {
+    const normalized = canonicalAtomicType(member);
+    if (!normalized || normalized === "omit" || normalized === "notgiven" || normalized === "not_given") continue;
+    out.add(normalized);
+  }
+  if (!out.size) out.add("unknown");
+  return out;
+}
+
+function typesCompatible(specType?: string, sdkType?: string): boolean {
+  const spec = canonicalTypeSet(specType);
+  const sdk = canonicalTypeSet(sdkType);
+  if (spec.has("unknown") || sdk.has("unknown")) return true;
+  for (const token of spec) {
+    if (sdk.has(token)) return true;
+  }
+  return false;
+}
+
 function usesParameterBag(method: SdkMethodSurface): boolean {
   if (method.params.length === 0) return false;
   if (method.params.length > 2) return false;
@@ -330,9 +387,11 @@ export function computeDiff(
         continue;
       }
 
-      const specType = normalizeType(specParam.type?.name ?? specParam.type?.raw);
-      const sdkType = normalizeType(sdkParam.type?.name ?? sdkParam.type?.raw);
-      if (specType !== "unknown" && sdkType !== "unknown" && specType !== sdkType) {
+      const specTypeRaw = specParam.type?.name ?? specParam.type?.raw;
+      const sdkTypeRaw = sdkParam.type?.name ?? sdkParam.type?.raw;
+      const specType = normalizeType(specTypeRaw);
+      const sdkType = normalizeType(sdkTypeRaw);
+      if (!typesCompatible(specTypeRaw, sdkTypeRaw) && specType !== "unknown" && sdkType !== "unknown") {
         findings.push({
           id: `type_${operation.operationId}_${specParam.name}`,
           category: "type_mismatch",
@@ -344,6 +403,43 @@ export function computeDiff(
           remediation: remediationFor("type_mismatch", isHighConfidence)
         });
       }
+    }
+
+    if (operation.requestBody) {
+      const bodyParam = method.params.find((param) => {
+        const n = normalizeParamName(param.name);
+        return n.includes("body") || n.includes("data") || n.includes("request") || n.includes("input") || n.includes("payload");
+      });
+      if (!bodyParam) {
+        const hasUnknownParam = method.params.some((param) => param.in === "unknown");
+        const category: DriftCategory = dynamicParams || hasUnknownParam ? "param_not_explicit" : "required_field_added";
+        findings.push({
+          id: `body_${operation.operationId}`,
+          category,
+          severity: severityFor(category),
+          confidence: confidenceForFinding(category, match, isHighConfidence),
+          operationId: operation.operationId,
+          sdkMethodId: method.id,
+          message:
+            category === "param_not_explicit"
+              ? `Request body for ${operation.operationId} may be handled dynamically in ${method.methodName}`
+              : `Request body for ${operation.operationId} is not explicitly represented in SDK method ${method.methodName}`,
+          remediation: remediationFor(category, isHighConfidence)
+        });
+      }
+    }
+
+    if (typeof method.deprecated === "boolean" && method.deprecated !== operation.deprecated) {
+      findings.push({
+        id: `deprecated_${operation.operationId}_${method.id}`,
+        category: "deprecated_mismatch",
+        severity: severityFor("deprecated_mismatch"),
+        confidence: confidenceForFinding("deprecated_mismatch", match, isHighConfidence),
+        operationId: operation.operationId,
+        sdkMethodId: method.id,
+        message: `Deprecation mismatch for ${operation.operationId}: spec=${operation.deprecated}, sdk=${method.deprecated}`,
+        remediation: remediationFor("deprecated_mismatch", isHighConfidence)
+      });
     }
   }
 
