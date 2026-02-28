@@ -65,7 +65,7 @@ sdkdrift scan --spec <pathOrUrl> --sdk <path> --lang <python|ts> [options]
 - `--config <path>`: config file path (`sdkdrift.config.yaml`)
 - `--out <path>`: write report to file
 - `--min-score <0..100>`: fail process when score is lower than threshold
-- `--verbose`: emit matcher diagnostics to stderr
+- `--verbose`: emit matcher diagnostics plus per-finding `why matched` and `what verified` notes to stderr
 - `--compat-v1`: emit v1-compatible JSON schema when `--format json` is used
 
 ### Exit Codes

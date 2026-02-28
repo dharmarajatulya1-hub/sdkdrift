@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 
 const cli = "./packages/cli/dist/cli.js";
 
@@ -88,6 +88,20 @@ function runConfigErrorCase({ name, spec, sdk, lang, config, expectedError }) {
   assert.equal(exitCode, 1, `${name}: expected CLI error exit code 1`);
   assert.match(stderr, new RegExp(expectedError), `${name}: expected error message match`);
   console.log(`PASS ${name}: config validation error surfaced`);
+}
+
+function runVerboseCase({ name, spec, sdk, lang, config }) {
+  const args = [cli, "scan", "--spec", spec, "--sdk", sdk, "--lang", lang, "--format", "json", "--verbose"];
+  if (config) {
+    args.push("--config", config);
+  }
+
+  const result = spawnSync("node", args, { encoding: "utf8" });
+  assert.equal(result.status ?? 1, 0, `${name}: expected success`);
+  const stderr = String(result.stderr ?? "");
+  assert.match(stderr, /why matched:/, `${name}: missing why matched verbose section`);
+  assert.match(stderr, /what verified:/, `${name}: missing what verified verbose section`);
+  console.log(`PASS ${name}: verbose explanations emitted`);
 }
 
 runCase({
@@ -303,6 +317,13 @@ runCase({
   sdk: "./fixtures/cases/utility-noise/sdk/ts",
   lang: "ts",
   expectedScore: 100
+});
+
+runVerboseCase({
+  name: "verbose-explanations",
+  spec: "./fixtures/cases/param-bag-coverage-note/openapi.yaml",
+  sdk: "./fixtures/cases/param-bag-coverage-note/sdk/python",
+  lang: "python"
 });
 
 console.log("All fixture tests passed.");

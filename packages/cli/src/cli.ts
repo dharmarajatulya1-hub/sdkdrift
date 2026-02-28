@@ -231,6 +231,7 @@ async function run(): Promise<number> {
             unmatched.length ? `unmatched=${unmatched.join(",")}` : "unmatched=none"
           ].join(" ") + "\n"
         );
+        process.stderr.write(renderVerboseFindingExplanations(artifacts));
       }
 
       if (typeof args.minScore === "number" && report.score < args.minScore) {
@@ -240,6 +241,50 @@ async function run(): Promise<number> {
 
   await program.parseAsync(process.argv);
   return typeof process.exitCode === "number" ? process.exitCode : 0;
+}
+
+function normalizeParamName(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function hasBagParam(method: { params: Array<{ name: string }> } | undefined): boolean {
+  if (!method) return false;
+  return method.params.some((param) => {
+    const name = normalizeParamName(param.name);
+    return name.includes("request") || name.includes("params") || name.includes("options") || name.includes("input");
+  });
+}
+
+function renderVerboseFindingExplanations(
+  artifacts: Awaited<ReturnType<typeof scanWithArtifacts>>
+): string {
+  const lines: string[] = [];
+  const operationsById = new Map(artifacts.operations.map((operation) => [operation.operationId, operation]));
+  const methodsById = new Map(artifacts.methods.map((method) => [method.id, method]));
+  const matchesByOperation = new Map(artifacts.matches.map((match) => [match.operationId, match]));
+
+  for (const finding of artifacts.report.findings) {
+    const operation = finding.operationId ? operationsById.get(finding.operationId) : undefined;
+    const method = finding.sdkMethodId ? methodsById.get(finding.sdkMethodId) : undefined;
+    const match = finding.operationId ? matchesByOperation.get(finding.operationId) : undefined;
+    const topMargin = typeof match?.evidence?.topMargin === "number" ? match.evidence.topMargin : undefined;
+    const specParamCount = operation ? operation.pathParams.length + operation.queryParams.length : 0;
+    const sdkParamCount = method?.params.length ?? 0;
+    const unknownParamCount = method?.params.filter((param) => param.in === "unknown").length ?? 0;
+    const bodyCheck = operation?.requestBody ? "checked" : "n/a";
+    const deprecationCheck =
+      typeof operation?.deprecated === "boolean" && typeof method?.deprecated === "boolean" ? "checked" : "n/a";
+
+    lines.push(`[sdkdrift:verbose:finding] id=${finding.id} category=${finding.category} actionable=${Boolean(finding.isActionable)}`);
+    lines.push(
+      `  why matched: strategy=${match?.strategy ?? "n/a"} confidence=${match?.confidence ?? "n/a"} top_margin=${typeof topMargin === "number" ? topMargin.toFixed(3) : "n/a"} unmatched_reason=${match?.unmatchedReason ?? "none"}`
+    );
+    lines.push(
+      `  what verified: params(spec=${specParamCount},sdk=${sdkParamCount},unknown=${unknownParamCount}), bag_param=${hasBagParam(method) ? "yes" : "no"}, request_body=${bodyCheck}, deprecation=${deprecationCheck}`
+    );
+  }
+
+  return lines.length ? `${lines.join("\n")}\n` : "";
 }
 
 function toV1Compat(report: Awaited<ReturnType<typeof scanWithArtifacts>>["report"]) {
